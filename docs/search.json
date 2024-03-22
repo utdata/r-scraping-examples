@@ -1,0 +1,72 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Scraping examples in R",
+    "section": "",
+    "text": "Scraping is hard because every example is different. As I work through some of these, I’ll try to save examples in this repo."
+  },
+  {
+    "objectID": "index.html#the-list-so-far",
+    "href": "index.html#the-list-so-far",
+    "title": "Scraping examples in R",
+    "section": "The list so far",
+    "text": "The list so far\n\nPaginated tables"
+  },
+  {
+    "objectID": "index.html#other-resources",
+    "href": "index.html#other-resources",
+    "title": "Scraping examples in R",
+    "section": "Other resources",
+    "text": "Other resources\n\nHadley Wickam’s web scraping tutorial. He presented this as a half-day session at NICAR24.\nMy Billboard Data repo uses Github Actions and rvest to scrape on a schedule."
+  },
+  {
+    "objectID": "paginated-tables.html",
+    "href": "paginated-tables.html",
+    "title": "Paginated tables",
+    "section": "",
+    "text": "Figuring out how to scrape a table with pagination based on a site a student wants to scrape.\nlibrary(tidyverse)\nlibrary(janitor)\nlibrary(httr2)\nlibrary(rvest)"
+  },
+  {
+    "objectID": "paginated-tables.html#figure-out-how-page-works",
+    "href": "paginated-tables.html#figure-out-how-page-works",
+    "title": "Paginated tables",
+    "section": "Figure out how page works",
+    "text": "Figure out how page works\nEven before we scrape the page, we need to learn about how it works.\n\nLook at the page in the browser\nUse the Inspect tool on the pagination part of the page\nWhat type of HTML element displays this data?\n\nIt is a &lt;table&gt; tag, which is good for us. It’s easy to scrape tables with rvest.\n\nHow is the “next page” url formulated?\n\nIf we click on the next page in our table, the browser url doesn’t change. But, if you look at the HTML elements that make up the pagination navigation you can see the url pattern.\n\n\nhttps://planestrategico.conl.mx/indicadores/detalle/ods/242/datos?page=2 gets you the second page of the table."
+  },
+  {
+    "objectID": "paginated-tables.html#scrape-a-single-page-to-work-the-logic",
+    "href": "paginated-tables.html#scrape-a-single-page-to-work-the-logic",
+    "title": "Paginated tables",
+    "section": "Scrape a single page to work the logic",
+    "text": "Scrape a single page to work the logic\nBefore we can scrape all the pages, we need to figure out how to scrape a single one.\n\nGet the html\nWe use rvest functions to read the entire page into memory. We are saving the URL separately so we can test it with our “paginated” page urls.\n\nurl &lt;- \"https://planestrategico.conl.mx/indicadores/detalle/ods/242/datos?page\"\n# url &lt;- \"https://planestrategico.conl.mx/indicadores/detalle/ods/242/datos?page=2\"\n\nhtml &lt;- read_html(url)"
+  },
+  {
+    "objectID": "paginated-tables.html#find-the-content-on-the-page",
+    "href": "paginated-tables.html#find-the-content-on-the-page",
+    "title": "Paginated tables",
+    "section": "Find the content on the page",
+    "text": "Find the content on the page\nWe saw from inspecting the page that our data is in a table. Rvest has a function to pull all the tables from a page and put them into a list.\nOur page only has one table, but the function still saves it into a list, so we have to select the the first table from the list of tables.\n\n# puts all the tables on the page into a list we call \"tables\"\ntables &lt;- html |&gt; html_table()\n\n# selects the first table from the list (the one we want)\ntables |&gt; _[[1]]\n\n\n  \n\n\n\nSo now we know how to read the html of the page, get a list of all the tables, then pluck out the first table in that list."
+  },
+  {
+    "objectID": "paginated-tables.html#function-to-parse-the-page",
+    "href": "paginated-tables.html#function-to-parse-the-page",
+    "title": "Paginated tables",
+    "section": "Function to parse the page",
+    "text": "Function to parse the page\nNow that we know where our table is, we will build a function that when fed the URL of a page, it will pluck out that first table based on what we learned above.\nOne additional thing we do here vs above is to use clean_names() on the resulting table.\n\nparse_page &lt;- function(our_url) {\n  our_url |&gt; \n    read_html() |&gt; \n    html_table() |&gt; _[[1]] |&gt; \n    clean_names()\n}\n\n# We test this by feeding it the url variable we also used above\nparse_page(url)\n\n\n  \n\n\n\nTo make sure this works with one of the paginated pages, you can go back to the top of the script and modify the url variable to pull the page with ?page=2 tacked onto the end."
+  },
+  {
+    "objectID": "paginated-tables.html#get-and-combine-paginated-pages",
+    "href": "paginated-tables.html#get-and-combine-paginated-pages",
+    "title": "Paginated tables",
+    "section": "Get and combine paginated pages",
+    "text": "Get and combine paginated pages\nWe are lucky that we have a predictable URL pattern that includes sequential numbers. This allows us to create a list of URLs that we can run through our parse_page() function.\nWe have to feed this the correct number of pages to put together. You can get that by looking at how many pages are in the table’s pagination navigation.\n\n# This range has to be valid. See how many pages are in the table\ni &lt;- 1:39\n\n# This creates a list of urls based on that range\nurls &lt;- str_glue(\"https://planestrategico.conl.mx/indicadores/detalle/ods/242/datos?page={i}\")\n\n# This takes that list of urls and then runs our parse_page() function on each one.\n# The result is a list tibbles, i.e., a table from each page\nrequests &lt;- map(urls, parse_page)\n\n# list_rbind is a special function that binds a list of tibbles into a single one\ncombined_table &lt;- requests |&gt; list_rbind()\n\n# here we just peek at the table\ncombined_table"
+  },
+  {
+    "objectID": "paginated-tables.html#some-summary-notes",
+    "href": "paginated-tables.html#some-summary-notes",
+    "title": "Paginated tables",
+    "section": "Some summary notes",
+    "text": "Some summary notes\n\nSince there are a number of pages on this website that have data, it is possible to take this last part above and extrapolate it into a new function that takes two arguments: a) the URL of the page, b) the max number of pages in the table.\nIn Hadley’s example he used some httr2 features to do some parallel processing of pages, but I couldn’t figure out how to get that to work."
+  }
+]
