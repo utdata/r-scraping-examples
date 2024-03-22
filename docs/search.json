@@ -2,23 +2,9 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "Scraping examples in R",
+    "title": "Scraping examples",
     "section": "",
-    "text": "Scraping is hard because every example is different. As I work through some of these, I’ll try to save examples in this repo."
-  },
-  {
-    "objectID": "index.html#the-list-so-far",
-    "href": "index.html#the-list-so-far",
-    "title": "Scraping examples in R",
-    "section": "The list so far",
-    "text": "The list so far\n\nPaginated tables"
-  },
-  {
-    "objectID": "index.html#other-resources",
-    "href": "index.html#other-resources",
-    "title": "Scraping examples in R",
-    "section": "Other resources",
-    "text": "Other resources\n\nHadley Wickam’s web scraping tutorial. He presented this as a half-day session at NICAR24.\nMy Billboard Data repo uses Github Actions and rvest to scrape on a schedule."
+    "text": "{{&lt; README.md &gt;}}"
   },
   {
     "objectID": "paginated-tables.html",
