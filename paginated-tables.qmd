@@ -1,0 +1,110 @@
+---
+title: "Paginated tables"
+---
+
+Figuring out how to scrape a table with pagination based on a site a student wants to scrape.
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(janitor)
+library(httr2)
+library(rvest)
+```
+
+## Figure out how page works
+
+Even before we scrape the page, we need to learn about how it works.
+
+1. Look at [the page](https://planestrategico.conl.mx/indicadores/detalle/ods/242/datos) in the browser
+2. Use the Inspect tool on the pagination part of the page
+3. What type of HTML element displays this data?
+    - It is a `<table>` tag, which is good for us. It's easy to scrape tables with rvest.
+4. How is the "next page" url formulated?
+    - If we click on the next page in our table, the browser url doesn't change. But, if you look at the HTML elements that make up the pagination navigation you can see the url pattern.
+
+`https://planestrategico.conl.mx/indicadores/detalle/ods/242/datos?page=2` gets you the second page of the table.
+
+## Scrape a single page to work the logic
+
+Before we can scrape all the pages, we need to figure out how to scrape a single one.
+
+### Get the html
+
+We use rvest functions to read the entire page into memory. We are saving the URL separately so we can test it with our "paginated" page urls.
+
+```{r}
+url <- "https://planestrategico.conl.mx/indicadores/detalle/ods/242/datos?page"
+# url <- "https://planestrategico.conl.mx/indicadores/detalle/ods/242/datos?page=2"
+
+html <- read_html(url)
+```
+
+## Find the content on the page
+
+We saw from inspecting the page that our data is in a table. Rvest has a function to pull all the tables from a page and put them into a list.
+
+Our page only has one table, but the function still saves it into a list, so we have to select the the first table from the list of tables.
+
+```{r}
+# puts all the tables on the page into a list we call "tables"
+tables <- html |> html_table()
+
+# selects the first table from the list (the one we want)
+tables |> _[[1]]
+```
+
+So now we know how to read the html of the page, get a list of all the tables, then pluck out the first table in that list.
+
+## Function to parse the page
+
+Now that we know where our table is, we will build a function that when fed the URL of a page, it will pluck out that first table based on what we learned above.
+
+One additional thing we do here vs above is to use `clean_names()` on the resulting table.
+
+```{r}
+parse_page <- function(our_url) {
+  our_url |> 
+    read_html() |> 
+    html_table() |> _[[1]] |> 
+    clean_names()
+}
+
+# We test this by feeding it the url variable we also used above
+parse_page(url)
+```
+
+To make sure this works with one of the paginated pages, you can go back to the top of the script and modify the `url` variable to pull the page with `?page=2` tacked onto the end.
+
+## Get and combine paginated pages
+
+We are lucky that we have a predictable URL pattern that includes sequential numbers. This allows us to create a list of URLs that we can run through our `parse_page()` function.
+
+We have to feed this the correct number of pages to put together. You can get that by looking at how many pages are in the table's pagination navigation.
+
+```{r}
+# This range has to be valid. See how many pages are in the table
+i <- 1:39
+
+# This creates a list of urls based on that range
+urls <- str_glue("https://planestrategico.conl.mx/indicadores/detalle/ods/242/datos?page={i}")
+
+# This takes that list of urls and then runs our parse_page() function on each one.
+# The result is a list tibbles, i.e., a table from each page
+requests <- map(urls, parse_page)
+
+# list_rbind is a special function that binds a list of tibbles into a single one
+combined_table <- requests |> list_rbind()
+
+# here we just peek at the table
+combined_table
+```
+
+## Some summary notes
+
+- Since there are a number of pages on this website that have data, it is _possible_ to take this last part above and extrapolate it into a new function that takes two arguments: a) the URL of the page, b) the max number of pages in the table.
+- In Hadley's example he used some httr2 features to do some parallel processing of pages, but I couldn't figure out how to get that to work.
+
