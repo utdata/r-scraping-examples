@@ -2,6 +2,15 @@
 title: "Paginated tables"
 ---
 
+::: callout
+
+### Late notes
+
+- [This page](https://planestrategico.conl.mx/indicadores/descarga-masiva/capitulos) might have individual downloads of this data. 
+- [This page](https://planestrategico.conl.mx/indicadores/descarga-masiva/todos) has all the data together?
+
+:::
+
 Figuring out how to scrape a table with pagination based on a site a student wants to scrape.
 
 ```{r}
