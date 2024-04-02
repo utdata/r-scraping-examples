@@ -1,6 +1,7 @@
 ---
 title: "Scraping examples in R"
 author: "Christian McDonald"
+date: "April 1, 2024"
 ---
 
 Scraping is hard because every example is different. As I work through some of these, I'll try to save examples in this repo.

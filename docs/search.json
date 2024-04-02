@@ -68,5 +68,26 @@
     "title": "Paginated tables",
     "section": "Some summary notes",
     "text": "Some summary notes\n\nSince there are a number of pages on this website that have data, it is possible to take this last part above and extrapolate it into a new function that takes two arguments: a) the URL of the page, b) the max number of pages in the table.\nIn Hadley’s example he used some httr2 features to do some parallel processing of pages, but I couldn’t figure out how to get that to work."
+  },
+  {
+    "objectID": "test.html",
+    "href": "test.html",
+    "title": "testing",
+    "section": "",
+    "text": "library(tidyverse)\nlibrary(janitor)\nlibrary(rvest)\nlibrary(httr2)\nGet html\n# url &lt;- \"https://planestrategico.conl.mx/indicadores/detalle/ods/242/datos?page\"\nurl &lt;- \"https://planestrategico.conl.mx/indicadores/detalle/ods/242/datos?page=2\"\n\nhtml &lt;- read_html(url)\ntables &lt;- html |&gt; html_table()\n\ntables[[1]]\n\n\n  \n\n\ntables |&gt; _[[1]]"
+  },
+  {
+    "objectID": "test.html#function-to-parse-page",
+    "href": "test.html#function-to-parse-page",
+    "title": "testing",
+    "section": "Function to parse page",
+    "text": "Function to parse page\n\nparse_page &lt;- function(our_url) {\n  our_url |&gt; \n    read_html() |&gt; \n    html_table() |&gt; _[[1]] |&gt; \n    clean_names()\n}\n\n# We test this by feeding it the url variable we also used above\nparse_page(url)"
+  },
+  {
+    "objectID": "test.html#get-and-combine-the-pages",
+    "href": "test.html#get-and-combine-the-pages",
+    "title": "testing",
+    "section": "Get and combine the pages",
+    "text": "Get and combine the pages\n\n# This range has to be valid. See how many pages are in the table\ni &lt;- 1:39\n\n# This creates a list of urls based on that range\nurls &lt;- str_glue(\"https://planestrategico.conl.mx/indicadores/detalle/ods/242/datos?page={i}\")\n\n# This takes that list of urls and then runs our parse_page() function on each one.\n# The result is a list tibbles, i.e., a table from each page\nrequests &lt;- map(urls, parse_page)\n\n# list_rbind is a special function that binds a list of tibbles into a single one\ncombined_table_data &lt;- requests |&gt; list_rbind()\n\n# here we just peek at the table\n\ncombined_table &lt;- combined_table_data |&gt; mutate(source = \"climate\")\n\n\n# This range has to be valid. See how many pages are in the table\ni &lt;- 1:7\n\n# This creates a list of urls based on that range\nurls &lt;- str_glue(\"https://planestrategico.conl.mx/indicadores/detalle/ods/934/datos?page={i}\")\n\n# This takes that list of urls and then runs our parse_page() function on each one.\n# The result is a list tibbles, i.e., a table from each page\nrequests &lt;- map(urls, parse_page)\n\n# list_rbind is a special function that binds a list of tibbles into a single one\nwater_insecurity_data &lt;- requests |&gt; list_rbind()\n\n# here we just peek at the table\n\nwater_insecurity &lt;- water_insecurity_data |&gt;\n  mutate(source = \"water_insecurity\")\n\nwater_insecurity\n\n\n  \n\n\n\ncombine the dat\n\nall_the_data &lt;- bind_rows(combined_table, water_insecurity)\n\nall_the_data\n\n\n  \n\n\n\n\nall_the_data |&gt; filter(source == \"water_insecurity\") |&gt; \n  arrange(valor) |&gt; \n  group_by(ano) |&gt;\n  mutate(rank = min_rank(valor)) |&gt; \n  arrange(rank)\n\n\n  \n\n\n\n\nall_the_data |&gt; \n  ggplot(aes(y = unidad_geografica_str, x = valor, group = source)) +\n  geom_line(aes(color = source))"
   }
 ]
