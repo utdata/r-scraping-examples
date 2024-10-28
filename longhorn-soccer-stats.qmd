@@ -1,0 +1,331 @@
+---
+title: "Longhorn Soccer Stats"
+---
+
+The goal here is to scrape individual and goalkeeper stats from the University of Texas women's soccer team web pages. The data is stored in tables on the "Box Score" page for each game. The data is then cleaned and exported as RDS files.
+
+Those files will have to be imported and combined, and then cleaned up before analysis.
+
+## Of note
+
+This creates two files for each game (player stats and goalkeeper stats) and exports them as rds files. The idea is those files could be combined in a later script and further cleaning done.
+
+This could be refactored to pull all the URLs from a schedule page and then run through a Github action to collect the data each week.
+
+## Things to collect from each page
+
+- The date of the game
+- The location of the game
+- The visiting team
+- The home team
+- Individual stats for visitors
+- Goalkeeping stats for visitors
+- Individual stats for home team
+- Goalkeeping stats for home team
+
+## Some pages to test
+
+- [Houston vs Texas](https://texaslonghorns.com/sports/womens-soccer/stats/2024/houston/boxscore/16304) is a 2024 home game.
+- [Texas vs SMU](https://texaslonghorns.com/sports/womens-soccer/stats/2024/smu/boxscore/16306) is a 2024 road game.
+- [Texas vs Florida St.](https://texaslonghorns.com/sports/womens-soccer/stats/2023/florida-state/boxscore/16066) is a 2023 post-season match.
+- [Incarnate Word vs Texas](https://texaslonghorns.com/sports/womens-soccer/stats/2022/incarnate-word-exhibition-/boxscore/14935) is a game from a previous year. It also doesn't have "Cautions and Ejections" which revealed I needed a better way to pick out the correct tables.
+
+## Setup
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(janitor)
+library(rvest)
+```
+
+
+## Functions
+
+Once I figured out how to do all this, I turned the process into a function that can be fed a list of URLs to make files for each match.
+
+
+### Scrape stats function
+
+This combines all the processing worked out below and turns it into a function so we can feed a list of URLs to make all the files.
+
+```{r}
+scrape_stats <- function(file_url) {
+  # reads in URL
+  game_stats_raw <- read_html(file_url)
+  
+  # pulls game details from description list
+  m_details <- game_stats_raw |> html_nodes("dd") |> html_text()
+  
+  # creates variables for game details
+  m_date <- m_details[[1]] |> mdy()
+  m_site <- m_details[[3]]
+  m_stadium <- m_details[[4]]
+  
+  # pulls who is visitor vs home
+  subheads <- game_stats_raw |> html_nodes(".sub-heading") |> html_text()
+  
+  # creates lists of team names and scores
+  v_team_score <- subheads[[4]] |> str_split(" ") |> unlist()
+  h_team_score <- subheads[[5]] |> str_split(" ") |> unlist()
+  
+  # creates variables for visitor/home team names and scores
+  v_team <- v_team_score[[1]]
+  v_score <- v_team_score[[2]] |> parse_number()
+  h_team <- h_team_score[[1]]
+  h_score <- h_team_score[[2]] |> parse_number()
+  
+  # A function to handle some player stats cleaning
+  clean_indi_stats <- function(df) {
+    df |> mutate(
+    start = case_when(
+      player == "Starters" ~ "Starter",
+      player == "Substitutes" ~ "Substitute",
+      player == "Totals" ~ "Total",
+      .default = NA
+    ), .after = pos,
+  ) |> fill(start) |> 
+    filter(!player %in% c("Starters", "Substitutes", "Totals")) |> 
+    mutate(
+      date = m_date,
+      site = m_site,
+    )
+  }
+  
+  # creates list of individual stats tables
+  game_stats_tables <- game_stats_raw |> html_elements("section#individual-stats") |> minimal_html() |> html_table()
+  
+  # gets each table type depending on visitor/home
+  v_pl_raw <- game_stats_tables[[1]] |> clean_names()
+  v_gk_raw <- game_stats_tables[[2]] |> clean_names()
+  h_pl_raw <- game_stats_tables[[3]] |> clean_names()
+  h_gk_raw <- game_stats_tables[[4]] |> clean_names()
+  
+  # adds team names to individual stats
+  v_pl <- v_pl_raw |> 
+    clean_indi_stats() |> 
+    mutate(team = v_team, vs = h_team)
+  
+  h_pl <- h_pl_raw |> 
+    clean_indi_stats() |> 
+    mutate(team = h_team, vs = v_team)
+  
+  # combines visitor/home data into one table
+  pl <- bind_rows(v_pl, h_pl)
+  
+  # adds game details and team names to goalkeeping stats: visitors
+  v_gk <- v_gk_raw |>
+    filter(!goalie %in% c("Goalkeeping", "Totals")) |> 
+    mutate(team = v_team, vs = h_team, date = m_date, site = m_site)
+  
+  # adds game details and team names to goalkeeping stats: home
+  h_gk <- h_gk_raw |>
+    filter(!goalie %in% c("Goalkeeping", "Totals")) |> 
+    mutate(team = h_team, vs = v_team, date = m_date, site = m_site)
+
+  # combines goalkeeper stats
+  gk <- bind_rows(v_gk, h_gk)
+  
+  # preps file names for export based on matchup
+  file_name_prefix <- paste(m_date, v_team, h_team, sep = "_") |> str_replace_all(" ", "_") |> str_replace_all("/", "-")
+  
+  pl_export_path <- paste("data-raw/soccer/", "pl_", file_name_prefix, ".rds", sep = "")
+  gk_export_path <- paste("data-raw/soccer/", "gk_", file_name_prefix, ".rds", sep = "")
+
+  # exports files
+  pl |> write_rds(pl_export_path)
+  gk |> write_rds(gk_export_path)
+}
+```
+
+This is a test of a single file. Commented for now.
+
+```{r}
+# scrape_stats("https://texaslonghorns.com/sports/womens-soccer/stats/2024/houston/boxscore/16304")
+```
+
+
+### Build list of files to process
+
+This should be refactored to use a [schedule page](https://texaslonghorns.com/sports/womens-soccer/schedule/2024) to get all the URLs to the box score pages, but I don't have that in me right now.
+
+```{r}
+url_list <- c(
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/houston/boxscore/16304",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/smu/boxscore/16306",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/cal-state-bakersfield/boxscore/16305",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2023/florida-state/boxscore/16066",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2022/incarnate-word-exhibition-/boxscore/14935"
+)
+```
+
+### Process all the files
+
+This uses map to process all the files.
+
+```{r}
+url_list |> map(scrape_stats)
+```
+
+## Working out details
+
+This is the code I used to work out the process function above.
+
+### Get the raw HTML
+
+```{r}
+game_stats_raw <- read_html("https://texaslonghorns.com/sports/womens-soccer/stats/2024/houston/boxscore/16304")
+```
+
+### Match details
+
+We pull these from a description list on the main "Box Score" page.
+
+```{r}
+m_details <- game_stats_raw |> html_nodes("dd") |> html_text()
+
+m_date <- m_details[[1]] |> mdy()
+m_site <- m_details[[3]]
+m_stadium <- m_details[[4]]
+
+```
+
+### Teams and scores
+
+We get these from the subheads on the "Individual" page.
+
+```{r}
+subheads <- game_stats_raw |> html_nodes(".sub-heading") |> html_text()
+
+v_team_score <- subheads[[4]] |> str_split(" ") |> unlist()
+h_team_score <- subheads[[5]] |> str_split(" ") |> unlist()
+
+v_team <- v_team_score[[1]]
+v_score <- v_team_score[[2]] |> parse_number()
+h_team <- h_team_score[[1]]
+h_score <- h_team_score[[2]] |> parse_number()
+
+paste("Visiting team was", v_team, "and their score was", v_score)
+paste("Home team was", h_team, "and their score was", h_score)
+```
+
+### Individual stats
+
+There are four separate tables we need that are displayed on the "Individual" tab.
+
+#### Get the tables
+
+```{r}
+game_stats_tables <- game_stats_raw |> html_elements("section#individual-stats") |> minimal_html() |> html_table()
+
+game_stats_tables
+```
+
+#### Saves specific tables we need
+
+```{r}
+v_pl_raw <- game_stats_tables[[1]] |> clean_names()
+v_gk_raw <- game_stats_tables[[2]] |> clean_names()
+h_pl_raw <- game_stats_tables[[3]] |> clean_names()
+h_gk_raw <- game_stats_tables[[4]] |> clean_names()
+```
+
+#### Clean individual stats
+
+A function to clean stats ...
+
+- Adds column to indicate starters
+- Removes totals and other headers
+
+```{r}
+  # A function to handle some player stats cleaning
+  clean_indi_stats <- function(df) {
+    df |> mutate(
+    start = case_when(
+      player == "Starters" ~ "Starter",
+      player == "Substitutes" ~ "Substitute",
+      player == "Totals" ~ "Total",
+      .default = NA
+    ), .after = pos,
+  ) |> fill(start) |> 
+    filter(!player %in% c("Starters", "Substitutes", "Totals")) |> 
+    mutate(
+      date = m_date,
+      site = m_site,
+    )
+  }
+
+```
+
+This takes the individual stats and runs them through the cleaning function above and then adds home and away team values.
+
+```{r}
+v_pl <- v_pl_raw |> 
+  clean_indi_stats() |> 
+  mutate(team = v_team, vs = h_team)
+
+v_pl
+```
+
+```{r}
+h_pl <- h_pl_raw |> 
+  clean_indi_stats() |> 
+  mutate(team = h_team, vs = v_team)
+
+h_pl
+```
+
+##### Combine individual stats
+
+Combines the visitor/home two player stats
+
+```{r}
+pl <- bind_rows(v_pl, h_pl)
+
+pl
+```
+
+
+#### Clean goalkeeper stats
+
+This is the same process as above, but for goalkeepers. It's a little less complicated.
+
+```{r}
+v_gk <- v_gk_raw |>
+  filter(!goalie %in% c("Goalkeeping", "Totals")) |> 
+  mutate(team = v_team, vs = h_team, date = m_date, site = m_site)
+
+h_gk <- h_gk_raw |>
+  filter(!goalie %in% c("Goalkeeping", "Totals")) |> 
+  mutate(team = h_team, vs = v_team, date = m_date, site = m_site)
+
+v_gk
+h_gk
+```
+
+##### Combine goalkeepers
+
+```{r}
+gk <- bind_rows(v_gk, h_gk)
+
+gk
+```
+
+### Writing the exports
+
+The actual exports are commented out so we don't overwrite what came from above.
+
+```{r}
+file_name_prefix <- paste(m_date, v_team, h_team, sep = "_") |> str_replace_all(" ", "_") |> str_replace_all("/", "-")
+
+pl_export_path <- paste("data-raw/soccer/", "pl_", file_name_prefix, ".rds", sep = "")
+gk_export_path <- paste("data-raw/soccer/", "gk_", file_name_prefix, ".rds", sep = "")
+
+## Commented so it doesn't write anything out
+# pl |> write_rds(pl_export_path)
+# gk |> write_rds(gk_export_path)
+```
+

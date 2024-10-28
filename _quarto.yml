@@ -4,11 +4,14 @@ project:
 
 website:
   title: "Scraping examples"
-  navbar:
-    left:
+  sidebar:
+    style: "docked"
+    search: true
+    contents:
       - href: index.qmd
         text: Home
       - paginated-tables.qmd
+      - longhorn-soccer-stats.qmd
 
 format:
   html:
