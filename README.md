@@ -4,7 +4,7 @@ author: "Christian McDonald"
 date: "Oct. 27, 2024"
 ---
 
-Scraping is hard because every example is different. As I work through some of these, I'll try to save examples in this repo.
+Scraping is challenging because every example is different. As I do different scraping projects, I'll try to save examples in this repo.
 
 ## The list so far
 
