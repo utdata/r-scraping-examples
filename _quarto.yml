@@ -12,6 +12,8 @@ website:
         text: Home
       - paginated-tables.qmd
       - longhorn-soccer-stats.qmd
+  repo-url: https://github.com/utdata/r-scraping-examples
+  repo-actions: [source, issue]
 
 format:
   html:
