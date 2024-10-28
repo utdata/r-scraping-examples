@@ -672,9 +672,17 @@ row col expected actual
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>pl_export_path <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">"data-raw/soccer/"</span>, <span class="st">"pl_"</span>, file_name_prefix, <span class="st">".rds"</span>, <span class="at">sep =</span> <span class="st">""</span>)</span>
 <span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>gk_export_path <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">"data-raw/soccer/"</span>, <span class="st">"gk_"</span>, file_name_prefix, <span class="st">".rds"</span>, <span class="at">sep =</span> <span class="st">""</span>)</span>
 <span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Commented so it doesn't write anything out</span></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co"># pl |&gt; write_rds(pl_export_path)</span></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="co"># gk |&gt; write_rds(gk_export_path)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>pl_export_path</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "data-raw/soccer/pl_2024-08-15_Houston_Texas.rds"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>gk_export_path</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "data-raw/soccer/gk_2024-08-15_Houston_Texas.rds"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Commented so it doesn't write anything out</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="co"># pl |&gt; write_rds(pl_export_path)</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co"># gk |&gt; write_rds(gk_export_path)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 

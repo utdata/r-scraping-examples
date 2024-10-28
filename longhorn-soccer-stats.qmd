@@ -324,6 +324,9 @@ file_name_prefix <- paste(m_date, v_team, h_team, sep = "_") |> str_replace_all(
 pl_export_path <- paste("data-raw/soccer/", "pl_", file_name_prefix, ".rds", sep = "")
 gk_export_path <- paste("data-raw/soccer/", "gk_", file_name_prefix, ".rds", sep = "")
 
+pl_export_path
+gk_export_path
+
 ## Commented so it doesn't write anything out
 # pl |> write_rds(pl_export_path)
 # gk |> write_rds(gk_export_path)
