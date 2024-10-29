@@ -10,6 +10,8 @@ Scraping is challenging because every example is different. As I do different sc
 
 - [Paginated tables](paginated-tables.qmd)
 - [Texas Longhorns Soccer Stats](longhorn-soccer-stats.qmd)
+- [Heisman voting](heisman-voting.qmd)
+- [Playbill grosses](playbill-grosses.qmd)
 
 ## Other resources
 

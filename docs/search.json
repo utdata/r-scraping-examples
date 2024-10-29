@@ -1,24 +1,13 @@
 [
   {
-    "objectID": "test.html",
-    "href": "test.html",
-    "title": "testing",
+    "objectID": "heisman-voting.html",
+    "href": "heisman-voting.html",
+    "title": "heisman",
     "section": "",
-    "text": "library(tidyverse)\nlibrary(janitor)\nlibrary(rvest)\nlibrary(httr2)\nGet html\n# url &lt;- \"https://planestrategico.conl.mx/indicadores/detalle/ods/242/datos?page\"\nurl &lt;- \"https://planestrategico.conl.mx/indicadores/detalle/ods/242/datos?page=2\"\n\nhtml &lt;- read_html(url)\ntables &lt;- html |&gt; html_table()\n\ntables[[1]]\n\n\n  \n\n\ntables |&gt; _[[1]]"
-  },
-  {
-    "objectID": "test.html#function-to-parse-page",
-    "href": "test.html#function-to-parse-page",
-    "title": "testing",
-    "section": "Function to parse page",
-    "text": "Function to parse page\n\nparse_page &lt;- function(our_url) {\n  our_url |&gt; \n    read_html() |&gt; \n    html_table() |&gt; _[[1]] |&gt; \n    clean_names()\n}\n\n# We test this by feeding it the url variable we also used above\nparse_page(url)"
-  },
-  {
-    "objectID": "test.html#get-and-combine-the-pages",
-    "href": "test.html#get-and-combine-the-pages",
-    "title": "testing",
-    "section": "Get and combine the pages",
-    "text": "Get and combine the pages\n\n# This range has to be valid. See how many pages are in the table\ni &lt;- 1:39\n\n# This creates a list of urls based on that range\nurls &lt;- str_glue(\"https://planestrategico.conl.mx/indicadores/detalle/ods/242/datos?page={i}\")\n\n# This takes that list of urls and then runs our parse_page() function on each one.\n# The result is a list tibbles, i.e., a table from each page\nrequests &lt;- map(urls, parse_page)\n\n# list_rbind is a special function that binds a list of tibbles into a single one\ncombined_table_data &lt;- requests |&gt; list_rbind()\n\n# here we just peek at the table\n\ncombined_table &lt;- combined_table_data |&gt; mutate(source = \"climate\")\n\n\n# This range has to be valid. See how many pages are in the table\ni &lt;- 1:7\n\n# This creates a list of urls based on that range\nurls &lt;- str_glue(\"https://planestrategico.conl.mx/indicadores/detalle/ods/934/datos?page={i}\")\n\n# This takes that list of urls and then runs our parse_page() function on each one.\n# The result is a list tibbles, i.e., a table from each page\nrequests &lt;- map(urls, parse_page)\n\n# list_rbind is a special function that binds a list of tibbles into a single one\nwater_insecurity_data &lt;- requests |&gt; list_rbind()\n\n# here we just peek at the table\n\nwater_insecurity &lt;- water_insecurity_data |&gt;\n  mutate(source = \"water_insecurity\")\n\nwater_insecurity\n\n\n  \n\n\n\ncombine the dat\n\nall_the_data &lt;- bind_rows(combined_table, water_insecurity)\n\nall_the_data\n\n\n  \n\n\n\n\nall_the_data |&gt; filter(source == \"water_insecurity\") |&gt; \n  arrange(valor) |&gt; \n  group_by(ano) |&gt;\n  mutate(rank = min_rank(valor)) |&gt; \n  arrange(rank)\n\n\n  \n\n\n\n\nall_the_data |&gt; \n  ggplot(aes(y = unidad_geografica_str, x = valor, group = source)) +\n  geom_line(aes(color = source))"
+    "text": "library(tidyverse)\nlibrary(janitor)\nlibrary(rvest)\n\n\nurl &lt;- \"https://www.sports-reference.com/cfb/awards/heisman-2023.html\"\n\n\nhf_2023 &lt;- read_html(url) |&gt; html_table()\n\nhf_2023 \n\n[[1]]\n# A tibble: 10 × 10\n      Rk Player               School Class Pos   `1st` `2nd` `3rd`   Tot Summary\n   &lt;int&gt; &lt;chr&gt;                &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;  \n 1     1 Jayden Daniels*      LSU    SR    QB      503   217    86  2029 236 Cm…\n 2     2 Michael Penix Jr.*   Washi… SR    QB      292   341   143  1701 363 Cm…\n 3     3 Bo Nix*              Oregon SR    QB       51   205   322   885 364 Cm…\n 4     4 Marvin Harrison Jr.* Ohio … JR    WR       20    78   136   352 67 Rec…\n 5     5 Jordan Travis*       Flori… SR    QB        8    19    23    85 207 Cm…\n 6     6 Jalen Milroe*        Alaba… SO    QB        4     8    45    73 187 Cm…\n 7     7 Ollie Gordon*        Oklah… SO    RB        1     2    24    31 285 At…\n 8     8 Cody Schrader*       Misso… JR    RB        1     2    22    29 276 At…\n 9     9 Blake Corum*         Michi… SR    RB        3     2    15    28 258 At…\n10    10 J.J. McCarthy*       Michi… JR    QB        1     7     4    21 240 Cm…\n\nhf_2023 |&gt; write_rds(\"data-raw/heisman/hv-2023.rds\")",
+    "crumbs": [
+      "heisman"
+    ]
   },
   {
     "objectID": "longhorn-soccer-stats.html",
@@ -88,6 +77,56 @@
     "text": "Working out details\nThis is the code I used to work out the process function above.\n\nGet the raw HTML\n\ngame_stats_raw &lt;- read_html(\"https://texaslonghorns.com/sports/womens-soccer/stats/2024/houston/boxscore/16304\")\n\n\n\nMatch details\nWe pull these from a description list on the main “Box Score” page.\n\nm_details &lt;- game_stats_raw |&gt; html_nodes(\"dd\") |&gt; html_text()\n\nm_date &lt;- m_details[[1]] |&gt; mdy()\nm_site &lt;- m_details[[3]]\nm_stadium &lt;- m_details[[4]]\n\n\n\nTeams and scores\nWe get these from the subheads on the “Individual” page.\n\nsubheads &lt;- game_stats_raw |&gt; html_nodes(\".sub-heading\") |&gt; html_text()\n\nv_team_score &lt;- subheads[[4]] |&gt; str_split(\" \") |&gt; unlist()\nh_team_score &lt;- subheads[[5]] |&gt; str_split(\" \") |&gt; unlist()\n\nv_team &lt;- v_team_score[[1]]\nv_score &lt;- v_team_score[[2]] |&gt; parse_number()\nh_team &lt;- h_team_score[[1]]\nh_score &lt;- h_team_score[[2]] |&gt; parse_number()\n\npaste(\"Visiting team was\", v_team, \"and their score was\", v_score)\n\n[1] \"Visiting team was Houston and their score was 0\"\n\npaste(\"Home team was\", h_team, \"and their score was\", h_score)\n\n[1] \"Home team was Texas and their score was 1\"\n\n\n\n\nIndividual stats\nThere are four separate tables we need that are displayed on the “Individual” tab.\n\nGet the tables\n\ngame_stats_tables &lt;- game_stats_raw |&gt; html_elements(\"section#individual-stats\") |&gt; minimal_html() |&gt; html_table()\n\ngame_stats_tables\n\n[[1]]\n# A tibble: 20 × 8\n   Pos           `#`           Player              SH    SOG   G     A     MIN  \n   &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;               &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;\n 1 \"Starters\"    \"Starters\"    \"Starters\"          Star… Star… Star… Star… \"Sta…\n 2 \"GK\"          \"1\"           \"1 \\r\\n           … 0     0     0     0     \"90\" \n 3 \"DEF\"         \"2\"           \"2 \\r\\n           … 0     0     0     0     \"90\" \n 4 \"FWD\"         \"3\"           \"3 \\r\\n           … 0     0     0     0     \"67\" \n 5 \"MID\"         \"5\"           \"5 \\r\\n           … 0     0     0     0     \"77\" \n 6 \"MID\"         \"10\"          \"10 \\r\\n          … 1     1     0     0     \"62\" \n 7 \"DEF\"         \"11\"          \"11 \\r\\n          … 0     0     0     0     \"22\" \n 8 \"DEF\"         \"12\"          \"12 \\r\\n          … 0     0     0     0     \"90\" \n 9 \"FWD\"         \"13\"          \"13 \\r\\n          … 1     0     0     0     \"69\" \n10 \"DEF\"         \"16\"          \"16 \\r\\n          … 0     0     0     0     \"74\" \n11 \"MID\"         \"18\"          \"18 \\r\\n          … 2     1     0     0     \"64\" \n12 \"FWD\"         \"26\"          \"26 \\r\\n          … 1     0     0     0     \"90\" \n13 \"Substitutes\" \"Substitutes\" \"Substitutes\"       Subs… Subs… Subs… Subs… \"Sub…\n14 \"mid\"         \"9\"           \"9 \\r\\n           … 0     0     0     0     \"5\"  \n15 \"mid\"         \"14\"          \"14 \\r\\n          … 0     0     0     0     \"13\" \n16 \"fwd\"         \"17\"          \"17 \\r\\n          … 0     0     0     0     \"28\" \n17 \"mid\"         \"19\"          \"19 \\r\\n          … 1     1     0     0     \"42\" \n18 \"mid\"         \"20\"          \"20 \\r\\n          … 0     0     0     0     \"39\" \n19 \"mid\"         \"24\"          \"24 \\r\\n          … 0     0     0     0     \"68\" \n20 \"\"            \"\"            \"Totals\"            6     3     0     0     \"\"   \n\n[[2]]\n# A tibble: 3 × 6\n  Position      `#`           Goalie           Minutes       GA          Saves  \n  &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;            &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt;  \n1 \"Goalkeeping\" \"Goalkeeping\" Goalkeeping      \"Goalkeeping\" Goalkeeping Goalke…\n2 \"GK\"          \"1\"           Dietrich, Olivia \"90:00\"       1           7      \n3 \"\"            \"\"            Totals           \"\"            1           7      \n\n[[3]]\n# A tibble: 19 × 8\n   Pos           `#`           Player              SH    SOG   G     A     MIN  \n   &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;               &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;\n 1 \"Starters\"    \"Starters\"    \"Starters\"          Star… Star… Star… Star… \"Sta…\n 2 \"GK\"          \"1\"           \"1 \\r\\n           … 0     0     0     0     \"90\" \n 3 \"DEF\"         \"8\"           \"8 \\r\\n           … 1     0     0     0     \"73\" \n 4 \"MID\"         \"9\"           \"9 \\r\\n           … 0     0     0     0     \"90\" \n 5 \"MID\"         \"10\"          \"10 \\r\\n          … 5     3     1     0     \"90\" \n 6 \"FWD\"         \"11\"          \"11 \\r\\n          … 0     0     0     0     \"53\" \n 7 \"DEF\"         \"12\"          \"12 \\r\\n          … 0     0     0     1     \"90\" \n 8 \"FWD\"         \"13\"          \"13 \\r\\n          … 4     1     0     0     \"61\" \n 9 \"FWD\"         \"15\"          \"15 \\r\\n          … 6     3     0     1     \"75\" \n10 \"DEF\"         \"23\"          \"23 \\r\\n          … 1     0     0     0     \"90\" \n11 \"DEF\"         \"25\"          \"25 \\r\\n          … 4     0     0     0     \"90\" \n12 \"MID\"         \"27\"          \"27 \\r\\n          … 1     0     0     0     \"70\" \n13 \"Substitutes\" \"Substitutes\" \"Substitutes\"       Subs… Subs… Subs… Subs… \"Sub…\n14 \"mid\"         \"4\"           \"4 \\r\\n           … 1     0     0     0     \"45\" \n15 \"def\"         \"5\"           \"5 \\r\\n           … 0     0     0     0     \"17\" \n16 \"fwd\"         \"7\"           \"7 \\r\\n           … 1     1     0     0     \"29\" \n17 \"fwd\"         \"16\"          \"16 \\r\\n          … 0     0     0     0     \"20\" \n18 \"fwd\"         \"44\"          \"44 \\r\\n          … 0     0     0     0     \"7\"  \n19 \"\"            \"\"            \"Totals\"            24    8     1     2     \"\"   \n\n[[4]]\n# A tibble: 3 × 6\n  Position      `#`           Goalie      Minutes       GA          Saves      \n  &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt;      \n1 \"Goalkeeping\" \"Goalkeeping\" Goalkeeping \"Goalkeeping\" Goalkeeping Goalkeeping\n2 \"GK\"          \"1\"           Justus, Mia \"90:00\"       0           3          \n3 \"\"            \"\"            Totals      \"\"            0           3          \n\n\n\n\nSaves specific tables we need\n\nv_pl_raw &lt;- game_stats_tables[[1]] |&gt; clean_names()\nv_gk_raw &lt;- game_stats_tables[[2]] |&gt; clean_names()\nh_pl_raw &lt;- game_stats_tables[[3]] |&gt; clean_names()\nh_gk_raw &lt;- game_stats_tables[[4]] |&gt; clean_names()\n\n\n\nClean individual stats\nA function to clean stats …\n\nAdds column to indicate starters\nRemoves totals and other headers\n\n\n  # A function to handle some player stats cleaning\n  clean_indi_stats &lt;- function(df) {\n    df |&gt; mutate(\n    start = case_when(\n      player == \"Starters\" ~ \"Starter\",\n      player == \"Substitutes\" ~ \"Substitute\",\n      player == \"Totals\" ~ \"Total\",\n      .default = NA\n    ), .after = pos,\n  ) |&gt; fill(start) |&gt; \n    filter(!player %in% c(\"Starters\", \"Substitutes\", \"Totals\")) |&gt; \n    mutate(\n      date = m_date,\n      site = m_site,\n    )\n  }\n\nThis takes the individual stats and runs them through the cleaning function above and then adds home and away team values.\n\nv_pl &lt;- v_pl_raw |&gt; \n  clean_indi_stats() |&gt; \n  mutate(team = v_team, vs = h_team)\n\nv_pl\n\n\n  \n\n\n\n\nh_pl &lt;- h_pl_raw |&gt; \n  clean_indi_stats() |&gt; \n  mutate(team = h_team, vs = v_team)\n\nh_pl\n\n\n  \n\n\n\n\nCombine individual stats\nCombines the visitor/home two player stats\n\npl &lt;- bind_rows(v_pl, h_pl)\n\npl\n\n\n  \n\n\n\n\n\n\nClean goalkeeper stats\nThis is the same process as above, but for goalkeepers. It’s a little less complicated.\n\nv_gk &lt;- v_gk_raw |&gt;\n  filter(!goalie %in% c(\"Goalkeeping\", \"Totals\")) |&gt; \n  mutate(team = v_team, vs = h_team, date = m_date, site = m_site)\n\nh_gk &lt;- h_gk_raw |&gt;\n  filter(!goalie %in% c(\"Goalkeeping\", \"Totals\")) |&gt; \n  mutate(team = h_team, vs = v_team, date = m_date, site = m_site)\n\nv_gk\n\n\n  \n\n\nh_gk\n\n\n  \n\n\n\n\nCombine goalkeepers\n\ngk &lt;- bind_rows(v_gk, h_gk)\n\ngk\n\n\n  \n\n\n\n\n\n\n\nWriting the exports\nThe actual exports are commented out so we don’t overwrite what came from above.\n\nfile_name_prefix &lt;- paste(m_date, v_team, h_team, sep = \"_\") |&gt; str_replace_all(\" \", \"_\") |&gt; str_replace_all(\"/\", \"-\")\n\npl_export_path &lt;- paste(\"data-raw/soccer/\", \"pl_\", file_name_prefix, \".rds\", sep = \"\")\ngk_export_path &lt;- paste(\"data-raw/soccer/\", \"gk_\", file_name_prefix, \".rds\", sep = \"\")\n\npl_export_path\n\n[1] \"data-raw/soccer/pl_2024-08-15_Houston_Texas.rds\"\n\ngk_export_path\n\n[1] \"data-raw/soccer/gk_2024-08-15_Houston_Texas.rds\"\n\n## Commented so it doesn't write anything out\n# pl |&gt; write_rds(pl_export_path)\n# gk |&gt; write_rds(gk_export_path)",
     "crumbs": [
       "Longhorn Soccer Stats"
+    ]
+  },
+  {
+    "objectID": "playbill-grosses.html",
+    "href": "playbill-grosses.html",
+    "title": "Playbill",
+    "section": "",
+    "text": "This would be a great example of needing to dive into specific cells within a table to pull out bits. That said, it is not figured out here yet.",
+    "crumbs": [
+      "Playbill"
+    ]
+  },
+  {
+    "objectID": "playbill-grosses.html#setup",
+    "href": "playbill-grosses.html#setup",
+    "title": "Playbill",
+    "section": "Setup",
+    "text": "Setup\n\nlibrary(tidyverse)\nlibrary(janitor)\nlibrary(rvest)",
+    "crumbs": [
+      "Playbill"
+    ]
+  },
+  {
+    "objectID": "playbill-grosses.html#basic-scrape",
+    "href": "playbill-grosses.html#basic-scrape",
+    "title": "Playbill",
+    "section": "Basic scrape",
+    "text": "Basic scrape\nCreate a url based on the week\n\nweek &lt;- \"2024-10-13\"\n\nurl &lt;- paste0(\"https://playbill.com/grosses?week=\",week)\nurl\n\n[1] \"https://playbill.com/grosses?week=2024-10-13\"\n\n\nRead in the url to get the page\n\nraw &lt;- read_html(url)\n\nraw\n\n{html_document}\n&lt;html lang=\"en\"&gt;\n[1] &lt;head&gt;\\n&lt;meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8 ...\n[2] &lt;body class=\"ua-desktop bsp-site-header-slidingnav \" style=\"\" data-dl-act ...\n\n\nFind the table and get its contents.\n\nmain_table &lt;- raw |&gt; html_element(\".bsp-table\") |&gt;  html_table()\n\nmain_table\n\n\n  \n\n\n\nThis works but it is a really shitty table that needs a don of cleaning. See potential refactor section below.",
+    "crumbs": [
+      "Playbill"
+    ]
+  },
+  {
+    "objectID": "playbill-grosses.html#export",
+    "href": "playbill-grosses.html#export",
+    "title": "Playbill",
+    "section": "Export",
+    "text": "Export\nExporting this awful table into a folder called playbill to keep it away from other things.\n\nexport_path &lt;- paste0(\"data-raw/playbill/playbill_\",week,\".rds\")\n  \nexport_path\n\n[1] \"data-raw/playbill/playbill_2024-10-13.rds\"\n\nmain_table |&gt; write_rds(export_path)",
+    "crumbs": [
+      "Playbill"
+    ]
+  },
+  {
+    "objectID": "playbill-grosses.html#refactoring-this-code",
+    "href": "playbill-grosses.html#refactoring-this-code",
+    "title": "Playbill",
+    "section": "Refactoring this code",
+    "text": "Refactoring this code\nThis “works” but the table is formatted in such a way that there are probably better (but more complicated) ways to pull out the data more cleanly, especially form columns like the first one that have the name and theater in the same td. Those have data labels and such.\nI just don’t know if it would be better. It would take some work to find out.\n&lt;td data-label=\"Show\" class=\"col-0\"&gt;\n  &lt;a href=\"https://playbill.com/production/gross?production=c3b6dace-a78e-439f-b3f2-bde3381bc6ff\" data-cms-ai=\"0\" rel=\"external\"&gt;\n    &lt;span class=\"data-value\"&gt;&amp; Juliet&lt;/span&gt;\n  &lt;/a&gt;\n  &lt;span class=\"subtext\"&gt;Stephen Sondheim Theatre&lt;/span&gt;\n&lt;/td&gt;",
+    "crumbs": [
+      "Playbill"
     ]
   },
   {
@@ -175,7 +214,7 @@
     "href": "index.html#the-list-so-far",
     "title": "Scraping examples in R",
     "section": "The list so far",
-    "text": "The list so far\n\nPaginated tables\nTexas Longhorns Soccer Stats",
+    "text": "The list so far\n\nPaginated tables\nTexas Longhorns Soccer Stats\nHeisman voting\nPlaybill grosses",
     "crumbs": [
       "Home"
     ]

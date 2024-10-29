@@ -1,0 +1,27 @@
+---
+title: "heisman"
+---
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(janitor)
+library(rvest)
+```
+
+
+```{r}
+url <- "https://www.sports-reference.com/cfb/awards/heisman-2023.html"
+```
+
+```{r}
+hf_2023 <- read_html(url) |> html_table()
+
+hf_2023 
+
+hf_2023 |> write_rds("data-raw/heisman/hv-2023.rds")
+```
+

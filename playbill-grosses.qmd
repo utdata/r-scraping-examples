@@ -1,0 +1,73 @@
+---
+title: "Playbill"
+---
+
+This would be a great example of needing to dive into specific cells within a table to pull out bits. That said, it is not figured out here yet.
+
+## Setup
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(janitor)
+library(rvest)
+```
+
+## Basic scrape
+
+Create a url based on the week
+
+```{r}
+week <- "2024-10-13"
+
+url <- paste0("https://playbill.com/grosses?week=",week)
+url
+```
+
+Read in the url to get the page
+
+```{r}
+raw <- read_html(url)
+
+raw
+```
+
+Find the table and get its contents.
+
+```{r}
+main_table <- raw |> html_element(".bsp-table") |>  html_table()
+
+main_table
+```
+
+This works but it is a really shitty table that needs a don of cleaning. See potential refactor section below.
+
+## Export
+
+Exporting this awful table into a folder called playbill to keep it away from other things.
+
+```{r}
+export_path <- paste0("data-raw/playbill/playbill_",week,".rds")
+  
+export_path
+
+main_table |> write_rds(export_path)
+```
+
+## Refactoring this code
+
+This "works" but the table is formatted in such a way that there are probably better (but more complicated) ways to pull out the data more cleanly, especially form columns like the first one that have the name and theater in the same td. Those have data labels and such.
+
+I just don't know if it would be better. It would take some work to find out.
+
+```html
+<td data-label="Show" class="col-0">
+  <a href="https://playbill.com/production/gross?production=c3b6dace-a78e-439f-b3f2-bde3381bc6ff" data-cms-ai="0" rel="external">
+    <span class="data-value">&amp; Juliet</span>
+  </a>
+  <span class="subtext">Stephen Sondheim Theatre</span>
+</td>
+```
