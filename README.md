@@ -12,6 +12,7 @@ Scraping is challenging because every example is different. As I do different sc
 - [Texas Longhorns Soccer Stats](longhorn-soccer-stats.qmd)
 - [Heisman voting](heisman-voting.qmd)
 - [Playbill grosses](playbill-grosses.qmd)
+- [Baseball reference batting stats](baseball-ref-batting.qmd)
 
 ## Other resources
 

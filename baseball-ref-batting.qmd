@@ -1,0 +1,79 @@
+---
+title: "Baseball Reference batting"
+---
+
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(janitor)
+library(rvest)
+```
+
+## Create scraping function
+
+
+```{r}
+#| label: read_html
+
+scrape_batting <- function(br_year) {
+
+  # Builds the url for the standard batting page
+  url <- paste0("https://www.baseball-reference.com/leagues/majors/", br_year, "-standard-batting.shtml")
+  
+  # reads in the HTML
+  br_batting_raw <- read_html(url)
+  
+  # finds the regular season batting table
+  # cleans names, adds year, add season type
+  br_batting_reg <- br_batting_raw |> 
+    html_element("#players_standard_batting") |>
+    html_table() |> 
+    clean_names() |> 
+    mutate(
+      season = br_year,
+      season_type = "Regular",
+      .before = rk
+    )
+  
+  # finds the playoff batting table
+  # cleans names, adds year, add season type
+  br_batting_post <- br_batting_raw |> 
+    html_element("#players_standard_batting_post") |>
+    html_table() |> 
+    clean_names() |> 
+    mutate(
+      season = br_year,
+      season_type = "Playoffs",
+      .before = rk
+    )
+  
+  # builds the export path for each based on year
+  export_url_reg <- paste0("data-raw/batting/br_bat_reg_", br_year, ".rds")
+  export_url_post <- paste0("data-raw/batting/br_bat_post_", br_year, ".rds")
+  
+  # the actual export
+  br_batting_reg |> write_rds(export_url_reg)
+  br_batting_post |> write_rds(export_url_post)
+
+}
+```
+
+## Do the deed
+
+```{r}
+
+# Sets a range of years to collect
+yrs <- c(2000:2003)
+
+# Creates a loop to get those files
+for (i in yrs) {
+  scrape_batting(i)
+}
+
+```
+
+
