@@ -82,6 +82,8 @@ br_batting_post <- br_batting_raw |>
     season_type = "Playoffs",
     .before = rk
   )
+
+br_batting_reg
 ```
 
 
