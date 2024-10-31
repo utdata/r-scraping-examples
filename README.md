@@ -1,7 +1,7 @@
 ---
 title: "Scraping examples in R"
 author: "Christian McDonald"
-date: "Oct. 27, 2024"
+date: "Oct. 31, 2024"
 ---
 
 Scraping is challenging because every example is different. As I do different scraping projects, I'll try to save examples in this repo.
@@ -13,6 +13,10 @@ Scraping is challenging because every example is different. As I do different sc
 - [Heisman voting](heisman-voting.qmd)
 - [Playbill grosses](playbill-grosses.qmd)
 - [Baseball reference batting stats](baseball-ref-batting.qmd)
+
+## To do
+
+Too many to list, but I do want to learn [polite](https://dmi3kno.github.io/polite/) and build in some wait time.
 
 ## Other resources
 

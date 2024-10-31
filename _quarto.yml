@@ -12,8 +12,9 @@ website:
         text: Home
       - paginated-tables.qmd
       - longhorn-soccer-stats.qmd
-      - heisman-voting.qmd
+      - baseball-ref-batting.qmd
       - playbill-grosses.qmd
+      - heisman-voting.qmd
   repo-url: https://github.com/utdata/r-scraping-examples
   repo-actions: [source, issue]
 
