@@ -1,5 +1,5 @@
 ---
-title: "heisman"
+title: "Heisman voting table"
 ---
 
 ```{r}
@@ -11,6 +11,8 @@ library(tidyverse)
 library(janitor)
 library(rvest)
 ```
+
+This could be modified like [Baseball Reference batting](baseball-ref-batting.qmd) to pull multiple years using a function.
 
 
 ```{r}
