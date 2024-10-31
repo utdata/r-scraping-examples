@@ -2,6 +2,9 @@
 title: "Baseball Reference batting"
 ---
 
+This pulls standard batting statistics from baseball-reference.com. We want to tables "Player Standard Batting" which is downpage on this for [2024](https://www.baseball-reference.com/leagues/majors/2024-standard-batting.shtml). There are actually two tables, one for regular season and one for playoffs. We want multiple seasons.
+
+## Setup
 
 ```{r}
 #| label: setup
@@ -13,11 +16,104 @@ library(janitor)
 library(rvest)
 ```
 
-## Create scraping function
 
+## Demonstrate pulling a single year
 
 ```{r}
-#| label: read_html
+br_year <- 2023
+
+# Builds the url for the standard batting page
+url <- paste0("https://www.baseball-reference.com/leagues/majors/", br_year, "-standard-batting.shtml")
+
+url
+```
+
+Then we get all the tables on the page to see what they look like. We don't actually use this object later, but it shows that you can build a list of tables.
+
+```{r}
+# reads in the HTML
+br_batting_raw <- read_html(url)
+
+br_batting_raw
+```
+That just shows we are getting the HTML of the page.
+
+## Plucking out tables
+
+We could get all the tables with html_table()
+
+```{r}
+all_tables <- br_batting_raw |> html_table()
+
+all_tables
+```
+
+If I then wanted the second table, I could use.
+
+```{r}
+all_tables[[2]]
+```
+
+Instead, I wanted to find the specific table more precisely by keying in on a specific element in the HTML code. I found that the batting tables I wanted had the id `players_standard_batting` and `players_standard_batting_post`. I can use the `html_element` function to find the specific table I want, then use `html_table` to convert it to a data frame.
+
+I do some other things to clean up the data, like renaming columns, adding a season and season_type (regular vs playoffs).
+
+```{r}
+# finds the regular season batting table
+# cleans names, adds year, add season type
+br_batting_reg <- br_batting_raw |> 
+  html_element("#players_standard_batting") |>
+  html_table() |> 
+  clean_names() |> 
+  mutate(
+    season = br_year,
+    season_type = "Regular",
+    .before = rk
+  )
+
+# finds the playoff batting table
+# cleans names, adds year, add season type
+br_batting_post <- br_batting_raw |> 
+  html_element("#players_standard_batting_post") |>
+  html_table() |> 
+  clean_names() |> 
+  mutate(
+    season = br_year,
+    season_type = "Playoffs",
+    .before = rk
+  )
+```
+
+
+## Export the data
+
+Now that I have that data, I can export it to a file.
+
+I'm using the `paste0` function to build the file name based on the year I'm working with.
+
+```{r}
+
+export_url_reg <- paste0("data-raw/batting/br_bat_reg_", br_year, ".rds")
+export_url_post <- paste0("data-raw/batting/br_bat_post_", br_year, ".rds")
+
+export_url_reg
+export_url_post
+```
+
+And then I export ..
+
+```{r}
+br_batting_reg |> write_rds(export_url_reg)
+br_batting_post |> write_rds(export_url_post)
+
+```
+
+## Create scraping function
+
+Here we turn what we learned above into a function so we can loop through a range of years.
+
+```{r}
+#| label: scrape-function
 
 scrape_batting <- function(br_year) {
 
@@ -63,6 +159,8 @@ scrape_batting <- function(br_year) {
 ```
 
 ## Do the deed
+
+Here I'm pulling just three years, but it could be extended.
 
 ```{r}
 
