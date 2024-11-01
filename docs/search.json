@@ -1,87 +1,57 @@
 [
   {
-    "objectID": "heisman-voting.html",
-    "href": "heisman-voting.html",
-    "title": "Heisman voting table",
+    "objectID": "s-tdcj-deathrow.html",
+    "href": "s-tdcj-deathrow.html",
+    "title": "Texas Death Row",
     "section": "",
-    "text": "library(tidyverse)\nlibrary(janitor)\nlibrary(rvest)\n\nThis could be modified like Baseball Reference batting to pull multiple years using a function.\n\nurl &lt;- \"https://www.sports-reference.com/cfb/awards/heisman-2023.html\"\n\n\nhf_2023 &lt;- read_html(url) |&gt; html_table()\n\nhf_2023 \n\n[[1]]\n# A tibble: 10 × 10\n      Rk Player               School Class Pos   `1st` `2nd` `3rd`   Tot Summary\n   &lt;int&gt; &lt;chr&gt;                &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;  \n 1     1 Jayden Daniels*      LSU    SR    QB      503   217    86  2029 236 Cm…\n 2     2 Michael Penix Jr.*   Washi… SR    QB      292   341   143  1701 363 Cm…\n 3     3 Bo Nix*              Oregon SR    QB       51   205   322   885 364 Cm…\n 4     4 Marvin Harrison Jr.* Ohio … JR    WR       20    78   136   352 67 Rec…\n 5     5 Jordan Travis*       Flori… SR    QB        8    19    23    85 207 Cm…\n 6     6 Jalen Milroe*        Alaba… SO    QB        4     8    45    73 187 Cm…\n 7     7 Ollie Gordon*        Oklah… SO    RB        1     2    24    31 285 At…\n 8     8 Cody Schrader*       Misso… JR    RB        1     2    22    29 276 At…\n 9     9 Blake Corum*         Michi… SR    RB        3     2    15    28 258 At…\n10    10 J.J. McCarthy*       Michi… JR    QB        1     7     4    21 240 Cm…\n\nhf_2023 |&gt; write_rds(\"data-raw/heisman/hv-2023.rds\")",
+    "text": "To scrape some data from a couple of urls on the Texas Department of Criminal Justice website.\nYet another example using rvest.\n\nexecuted offenders\ndeath row offenders",
     "crumbs": [
-      "Heisman voting table"
+      "Texas Death Row"
     ]
   },
   {
-    "objectID": "baseball-ref-batting.html",
-    "href": "baseball-ref-batting.html",
-    "title": "Baseball Reference batting",
+    "objectID": "s-tdcj-deathrow.html#goals",
+    "href": "s-tdcj-deathrow.html#goals",
+    "title": "Texas Death Row",
     "section": "",
-    "text": "This pulls standard batting statistics from baseball-reference.com. We want to tables “Player Standard Batting” which is downpage on this for 2024. There are actually two tables, one for regular season and one for playoffs. We want multiple seasons.",
+    "text": "To scrape some data from a couple of urls on the Texas Department of Criminal Justice website.\nYet another example using rvest.\n\nexecuted offenders\ndeath row offenders",
     "crumbs": [
-      "Baseball Reference batting"
+      "Texas Death Row"
     ]
   },
   {
-    "objectID": "baseball-ref-batting.html#setup",
-    "href": "baseball-ref-batting.html#setup",
-    "title": "Baseball Reference batting",
+    "objectID": "s-tdcj-deathrow.html#setup",
+    "href": "s-tdcj-deathrow.html#setup",
+    "title": "Texas Death Row",
     "section": "Setup",
     "text": "Setup\n\nlibrary(tidyverse)\nlibrary(janitor)\nlibrary(rvest)",
     "crumbs": [
-      "Baseball Reference batting"
+      "Texas Death Row"
     ]
   },
   {
-    "objectID": "baseball-ref-batting.html#demonstrate-pulling-a-single-year",
-    "href": "baseball-ref-batting.html#demonstrate-pulling-a-single-year",
-    "title": "Baseball Reference batting",
-    "section": "Demonstrate pulling a single year",
-    "text": "Demonstrate pulling a single year\n\nbr_year &lt;- 2023\n\n# Builds the url for the standard batting page\nurl &lt;- paste0(\"https://www.baseball-reference.com/leagues/majors/\", br_year, \"-standard-batting.shtml\")\n\nurl\n\n[1] \"https://www.baseball-reference.com/leagues/majors/2023-standard-batting.shtml\"\n\n\nThen we get all the tables on the page to see what they look like. We don’t actually use this object later, but it shows that you can build a list of tables.\n\n# reads in the HTML\nbr_batting_raw &lt;- read_html(url)\n\nbr_batting_raw\n\n{html_document}\n&lt;html data-version=\"klecko-\" data-root=\"/home/br/build\" lang=\"en\" class=\"no-js\"&gt;\n[1] &lt;head&gt;\\n&lt;meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8 ...\n[2] &lt;body class=\"br\"&gt;\\n&lt;div id=\"wrap\"&gt;\\n  \\n  &lt;div id=\"header\" role=\"banner\"&gt; ...\n\n\nThat just shows we are getting the HTML of the page.",
+    "objectID": "s-tdcj-deathrow.html#working-through-the-exercise",
+    "href": "s-tdcj-deathrow.html#working-through-the-exercise",
+    "title": "Texas Death Row",
+    "section": "Working through the exercise",
+    "text": "Working through the exercise\n\nExecuted Offenders\nGet the HTML tables from the page\n\n# gets the tables from the page as a list\nexecuted_tables &lt;- read_html(\"https://www.tdcj.texas.gov/death_row/dr_executed_offenders.html\") |&gt; \n  html_table()\n\n# selects the first table from the list and cleans headers\nexecuted_raw &lt;- executed_tables[[1]] |&gt; clean_names()\n\nexecuted_raw\n\n\n  \n\n\n\nDo the same for the deathrow table.\n\ndeathrow_tables &lt;- read_html(\"https://www.tdcj.texas.gov/death_row/dr_offenders_on_dr.html\") |&gt; \n  html_table()\n\ndeathrow_raw &lt;- deathrow_tables[[1]] |&gt; clean_names()\n\ndeathrow_raw",
     "crumbs": [
-      "Baseball Reference batting"
+      "Texas Death Row"
     ]
   },
   {
-    "objectID": "baseball-ref-batting.html#plucking-out-tables",
-    "href": "baseball-ref-batting.html#plucking-out-tables",
-    "title": "Baseball Reference batting",
-    "section": "Plucking out tables",
-    "text": "Plucking out tables\nWe could get all the tables with html_table()\n\nall_tables &lt;- br_batting_raw |&gt; html_table()\n\nall_tables\n\n[[1]]\n# A tibble: 33 × 29\n   Tm        `#Bat` BatAge `R/G` G     PA    AB    R     H     `2B`  `3B`  HR   \n   &lt;chr&gt;     &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;\n 1 Arizona … 54     27.4   4.60  162   6124  5436  746   1359  274   44    166  \n 2 Atlanta … 53     27.9   5.85  162   6249  5597  947   1543  293   23    307  \n 3 Baltimor… 50     27.2   4.98  162   6123  5495  807   1399  309   28    183  \n 4 Boston R… 56     28.6   4.77  162   6174  5562  772   1437  339   19    182  \n 5 Chicago … 48     28.4   5.06  162   6220  5504  819   1399  269   30    196  \n 6 Chicago … 56     27.8   3.96  162   5980  5501  641   1308  264   13    171  \n 7 Cincinna… 65     26.8   4.83  162   6195  5499  783   1371  268   37    198  \n 8 Clevelan… 50     26.6   4.09  162   6096  5513  662   1379  294   29    124  \n 9 Colorado… 57     28.1   4.45  162   6055  5496  721   1368  305   31    163  \n10 Detroit … 51     27.4   4.08  162   6080  5478  661   1292  245   29    165  \n# ℹ 23 more rows\n# ℹ 17 more variables: RBI &lt;chr&gt;, SB &lt;chr&gt;, CS &lt;chr&gt;, BB &lt;chr&gt;, SO &lt;chr&gt;,\n#   BA &lt;chr&gt;, OBP &lt;chr&gt;, SLG &lt;chr&gt;, OPS &lt;chr&gt;, `OPS+` &lt;chr&gt;, TB &lt;chr&gt;,\n#   GDP &lt;chr&gt;, HBP &lt;chr&gt;, SH &lt;chr&gt;, SF &lt;chr&gt;, IBB &lt;chr&gt;, LOB &lt;chr&gt;\n\n[[2]]\n# A tibble: 881 × 34\n      Rk Player        Age Team  Lg      WAR     G    PA    AB     R     H  `2B`\n   &lt;int&gt; &lt;chr&gt;       &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;\n 1     1 Matt Olson*    29 ATL   NL      7.4   162   720   608   127   172    27\n 2     2 Kyle Schwa…    30 PHI   NL      0.6   160   720   585   108   115    19\n 3     3 Pete Alonso    28 NYM   NL      3.2   154   658   568    92   123    21\n 4     4 Shohei Oht…    28 LAA   AL      6     135   599   497   102   151    26\n 5     5 Ronald Acu…    25 ATL   NL      8.2   159   735   643   149   217    35\n 6     6 Marcell Oz…    32 ATL   NL      3.3   144   592   530    84   145    29\n 7     7 Mookie Bet…    30 LAD   NL      8.3   152   693   584   126   179    40\n 8     8 Adolis Gar…    30 TEX   AL      4.2   148   632   555   108   136    29\n 9     9 Luis Rober…    25 CHW   AL      5     145   595   546    90   144    36\n10    10 Aaron Judge    31 NYY   AL      4.5   106   458   367    79    98    16\n# ℹ 871 more rows\n# ℹ 22 more variables: `3B` &lt;int&gt;, HR &lt;int&gt;, RBI &lt;int&gt;, SB &lt;int&gt;, CS &lt;int&gt;,\n#   BB &lt;int&gt;, SO &lt;int&gt;, BA &lt;dbl&gt;, OBP &lt;dbl&gt;, SLG &lt;dbl&gt;, OPS &lt;dbl&gt;,\n#   `OPS+` &lt;int&gt;, rOBA &lt;dbl&gt;, `Rbat+` &lt;int&gt;, TB &lt;int&gt;, GIDP &lt;int&gt;, HBP &lt;int&gt;,\n#   SH &lt;int&gt;, SF &lt;int&gt;, IBB &lt;int&gt;, Pos &lt;chr&gt;, Awards &lt;chr&gt;\n\n[[3]]\n# A tibble: 293 × 30\n      Rk Player        Age Team  Lg        G    PA    AB     R     H  `2B`  `3B`\n   &lt;int&gt; &lt;chr&gt;       &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;\n 1     1 Adolis Gar…    30 TEX   AL,WS    15    68    62    11    20     1     0\n 2     2 Yordan Alv…    26 HOU   AL       11    49    43    12    20     2     1\n 3     3 Corey Seag…    29 TEX   AL,WS    17    82    66    18    20     6     0\n 4     4 Nick Caste…    31 PHI   NL       13    52    47     7    10     2     0\n 5     5 Bryce Harp…    30 PHI   NL       13    55    42    14    12     0     0\n 6     6 Kyle Schwa…    30 PHI   NL       13    57    47     9    12     4     0\n 7     7 José Abreu     36 HOU   AL       11    48    44     6    13     1     0\n 8     8 Jose Altuve    33 HOU   AL       11    51    49    11    14     3     0\n 9     9 Alex Bregm…    29 HOU   AL       11    49    41    10     9     1     1\n10    10 Royce Lewis    24 MIN   AL        6    26    22     6     5     0     0\n# ℹ 283 more rows\n# ℹ 18 more variables: HR &lt;int&gt;, RBI &lt;int&gt;, SB &lt;int&gt;, CS &lt;int&gt;, BB &lt;int&gt;,\n#   SO &lt;int&gt;, BA &lt;dbl&gt;, OBP &lt;dbl&gt;, SLG &lt;dbl&gt;, OPS &lt;dbl&gt;, TB &lt;int&gt;, GIDP &lt;int&gt;,\n#   HBP &lt;int&gt;, SH &lt;int&gt;, SF &lt;int&gt;, IBB &lt;int&gt;, Pos &lt;chr&gt;, Awards &lt;chr&gt;\n\n\nIf I then wanted the second table, I could use.\n\nall_tables[[2]]\n\n\n  \n\n\n\nInstead, I wanted to find the specific table more precisely by keying in on a specific element in the HTML code. I found that the batting tables I wanted had the id players_standard_batting and players_standard_batting_post. I can use the html_element function to find the specific table I want, then use html_table to convert it to a data frame.\nI do some other things to clean up the data, like renaming columns, adding a season and season_type (regular vs playoffs).\n\n# finds the regular season batting table\n# cleans names, adds year, add season type\nbr_batting_reg &lt;- br_batting_raw |&gt; \n  html_element(\"#players_standard_batting\") |&gt;\n  html_table() |&gt; \n  clean_names() |&gt; \n  mutate(\n    season = br_year,\n    season_type = \"Regular\",\n    .before = rk\n  )\n\n# finds the playoff batting table\n# cleans names, adds year, add season type\nbr_batting_post &lt;- br_batting_raw |&gt; \n  html_element(\"#players_standard_batting_post\") |&gt;\n  html_table() |&gt; \n  clean_names() |&gt; \n  mutate(\n    season = br_year,\n    season_type = \"Playoffs\",\n    .before = rk\n  )\n\nbr_batting_reg",
+    "objectID": "s-tdcj-deathrow.html#export-the-files",
+    "href": "s-tdcj-deathrow.html#export-the-files",
+    "title": "Texas Death Row",
+    "section": "Export the files",
+    "text": "Export the files\n\nexecuted_raw |&gt; write_rds(\"data-raw/tdcj/executed_raw.rds\")\ndeathrow_raw |&gt; write_rds(\"data-raw/tdcj/deathrow_raw.rds\")",
     "crumbs": [
-      "Baseball Reference batting"
+      "Texas Death Row"
     ]
   },
   {
-    "objectID": "baseball-ref-batting.html#export-the-data",
-    "href": "baseball-ref-batting.html#export-the-data",
-    "title": "Baseball Reference batting",
-    "section": "Export the data",
-    "text": "Export the data\nNow that I have that data, I can export it to a file.\nI’m using the paste0 function to build the file name based on the year I’m working with.\n\nexport_url_reg &lt;- paste0(\"data-raw/batting/br_bat_reg_\", br_year, \".rds\")\nexport_url_post &lt;- paste0(\"data-raw/batting/br_bat_post_\", br_year, \".rds\")\n\nexport_url_reg\n\n[1] \"data-raw/batting/br_bat_reg_2023.rds\"\n\nexport_url_post\n\n[1] \"data-raw/batting/br_bat_post_2023.rds\"\n\n\nAnd then I export ..\n\nbr_batting_reg |&gt; write_rds(export_url_reg)\nbr_batting_post |&gt; write_rds(export_url_post)",
-    "crumbs": [
-      "Baseball Reference batting"
-    ]
-  },
-  {
-    "objectID": "baseball-ref-batting.html#create-scraping-function",
-    "href": "baseball-ref-batting.html#create-scraping-function",
-    "title": "Baseball Reference batting",
-    "section": "Create scraping function",
-    "text": "Create scraping function\nHere we turn what we learned above into a function so we can loop through a range of years.\n\nscrape_batting &lt;- function(br_year) {\n\n  # Builds the url for the standard batting page\n  url &lt;- paste0(\"https://www.baseball-reference.com/leagues/majors/\", br_year, \"-standard-batting.shtml\")\n  \n  # reads in the HTML\n  br_batting_raw &lt;- read_html(url)\n  \n  # finds the regular season batting table\n  # cleans names, adds year, add season type\n  br_batting_reg &lt;- br_batting_raw |&gt; \n    html_element(\"#players_standard_batting\") |&gt;\n    html_table() |&gt; \n    clean_names() |&gt; \n    mutate(\n      season = br_year,\n      season_type = \"Regular\",\n      .before = rk\n    )\n  \n  # finds the playoff batting table\n  # cleans names, adds year, add season type\n  br_batting_post &lt;- br_batting_raw |&gt; \n    html_element(\"#players_standard_batting_post\") |&gt;\n    html_table() |&gt; \n    clean_names() |&gt; \n    mutate(\n      season = br_year,\n      season_type = \"Playoffs\",\n      .before = rk\n    )\n  \n  # builds the export path for each based on year\n  export_url_reg &lt;- paste0(\"data-raw/batting/br_bat_reg_\", br_year, \".rds\")\n  export_url_post &lt;- paste0(\"data-raw/batting/br_bat_post_\", br_year, \".rds\")\n  \n  # the actual export\n  br_batting_reg |&gt; write_rds(export_url_reg)\n  br_batting_post |&gt; write_rds(export_url_post)\n\n}",
-    "crumbs": [
-      "Baseball Reference batting"
-    ]
-  },
-  {
-    "objectID": "baseball-ref-batting.html#do-the-deed",
-    "href": "baseball-ref-batting.html#do-the-deed",
-    "title": "Baseball Reference batting",
-    "section": "Do the deed",
-    "text": "Do the deed\nHere I’m pulling just three years, but it could be extended.\n\n# Sets a range of years to collect\nyrs &lt;- c(2000:2003)\n\n# Creates a loop to get those files\nfor (i in yrs) {\n  scrape_batting(i)\n}",
-    "crumbs": [
-      "Baseball Reference batting"
-    ]
-  },
-  {
-    "objectID": "paginated-tables.html",
-    "href": "paginated-tables.html",
+    "objectID": "s-paginated-tables.html",
+    "href": "s-paginated-tables.html",
     "title": "Paginated tables",
     "section": "",
     "text": "Late notes\n\n\n\n\nThis page might have individual downloads of this data.\nThis page has all the data together?\nFiguring out how to scrape a table with pagination based on a site a student wants to scrape.\nlibrary(tidyverse)\nlibrary(janitor)\nlibrary(httr2)\nlibrary(rvest)",
@@ -90,8 +60,8 @@
     ]
   },
   {
-    "objectID": "paginated-tables.html#figure-out-how-page-works",
-    "href": "paginated-tables.html#figure-out-how-page-works",
+    "objectID": "s-paginated-tables.html#figure-out-how-page-works",
+    "href": "s-paginated-tables.html#figure-out-how-page-works",
     "title": "Paginated tables",
     "section": "Figure out how page works",
     "text": "Figure out how page works\nEven before we scrape the page, we need to learn about how it works.\n\nLook at the page in the browser\nUse the Inspect tool on the pagination part of the page\nWhat type of HTML element displays this data?\n\nIt is a &lt;table&gt; tag, which is good for us. It’s easy to scrape tables with rvest.\n\nHow is the “next page” url formulated?\n\nIf we click on the next page in our table, the browser url doesn’t change. But, if you look at the HTML elements that make up the pagination navigation you can see the url pattern.\n\n\nhttps://planestrategico.conl.mx/indicadores/detalle/ods/242/datos?page=2 gets you the second page of the table.",
@@ -100,8 +70,8 @@
     ]
   },
   {
-    "objectID": "paginated-tables.html#scrape-a-single-page-to-work-the-logic",
-    "href": "paginated-tables.html#scrape-a-single-page-to-work-the-logic",
+    "objectID": "s-paginated-tables.html#scrape-a-single-page-to-work-the-logic",
+    "href": "s-paginated-tables.html#scrape-a-single-page-to-work-the-logic",
     "title": "Paginated tables",
     "section": "Scrape a single page to work the logic",
     "text": "Scrape a single page to work the logic\nBefore we can scrape all the pages, we need to figure out how to scrape a single one.\n\nGet the html\nWe use rvest functions to read the entire page into memory. We are saving the URL separately so we can test it with our “paginated” page urls.\n\nurl &lt;- \"https://planestrategico.conl.mx/indicadores/detalle/ods/242/datos?page\"\n# url &lt;- \"https://planestrategico.conl.mx/indicadores/detalle/ods/242/datos?page=2\"\n\nhtml &lt;- read_html(url)",
@@ -110,8 +80,8 @@
     ]
   },
   {
-    "objectID": "paginated-tables.html#find-the-content-on-the-page",
-    "href": "paginated-tables.html#find-the-content-on-the-page",
+    "objectID": "s-paginated-tables.html#find-the-content-on-the-page",
+    "href": "s-paginated-tables.html#find-the-content-on-the-page",
     "title": "Paginated tables",
     "section": "Find the content on the page",
     "text": "Find the content on the page\nWe saw from inspecting the page that our data is in a table. Rvest has a function to pull all the tables from a page and put them into a list.\nOur page only has one table, but the function still saves it into a list, so we have to select the the first table from the list of tables.\n\n# puts all the tables on the page into a list we call \"tables\"\ntables &lt;- html |&gt; html_table()\n\n# selects the first table from the list (the one we want)\ntables |&gt; _[[1]]\n\n\n  \n\n\n\nSo now we know how to read the html of the page, get a list of all the tables, then pluck out the first table in that list.",
@@ -120,8 +90,8 @@
     ]
   },
   {
-    "objectID": "paginated-tables.html#function-to-parse-the-page",
-    "href": "paginated-tables.html#function-to-parse-the-page",
+    "objectID": "s-paginated-tables.html#function-to-parse-the-page",
+    "href": "s-paginated-tables.html#function-to-parse-the-page",
     "title": "Paginated tables",
     "section": "Function to parse the page",
     "text": "Function to parse the page\nNow that we know where our table is, we will build a function that when fed the URL of a page, it will pluck out that first table based on what we learned above.\nOne additional thing we do here vs above is to use clean_names() on the resulting table.\n\nparse_page &lt;- function(our_url) {\n  our_url |&gt; \n    read_html() |&gt; \n    html_table() |&gt; _[[1]] |&gt; \n    clean_names()\n}\n\n# We test this by feeding it the url variable we also used above\nparse_page(url)\n\n\n  \n\n\n\nTo make sure this works with one of the paginated pages, you can go back to the top of the script and modify the url variable to pull the page with ?page=2 tacked onto the end.",
@@ -130,8 +100,8 @@
     ]
   },
   {
-    "objectID": "paginated-tables.html#get-and-combine-paginated-pages",
-    "href": "paginated-tables.html#get-and-combine-paginated-pages",
+    "objectID": "s-paginated-tables.html#get-and-combine-paginated-pages",
+    "href": "s-paginated-tables.html#get-and-combine-paginated-pages",
     "title": "Paginated tables",
     "section": "Get and combine paginated pages",
     "text": "Get and combine paginated pages\nWe are lucky that we have a predictable URL pattern that includes sequential numbers. This allows us to create a list of URLs that we can run through our parse_page() function.\nWe have to feed this the correct number of pages to put together. You can get that by looking at how many pages are in the table’s pagination navigation.\n\n# This range has to be valid. See how many pages are in the table\ni &lt;- 1:39\n\n# This creates a list of urls based on that range\nurls &lt;- str_glue(\"https://planestrategico.conl.mx/indicadores/detalle/ods/242/datos?page={i}\")\n\n# This takes that list of urls and then runs our parse_page() function on each one.\n# The result is a list tibbles, i.e., a table from each page\nrequests &lt;- map(urls, parse_page)\n\n# list_rbind is a special function that binds a list of tibbles into a single one\ncombined_table &lt;- requests |&gt; list_rbind()\n\n# here we just peek at the table\ncombined_table",
@@ -140,8 +110,8 @@
     ]
   },
   {
-    "objectID": "paginated-tables.html#some-summary-notes",
-    "href": "paginated-tables.html#some-summary-notes",
+    "objectID": "s-paginated-tables.html#some-summary-notes",
+    "href": "s-paginated-tables.html#some-summary-notes",
     "title": "Paginated tables",
     "section": "Some summary notes",
     "text": "Some summary notes\n\nSince there are a number of pages on this website that have data, it is possible to take this last part above and extrapolate it into a new function that takes two arguments: a) the URL of the page, b) the max number of pages in the table.\nIn Hadley’s example he used some httr2 features to do some parallel processing of pages, but I couldn’t figure out how to get that to work.",
@@ -150,58 +120,78 @@
     ]
   },
   {
-    "objectID": "playbill-grosses.html",
-    "href": "playbill-grosses.html",
-    "title": "Playbill",
+    "objectID": "s-bbref-batting.html",
+    "href": "s-bbref-batting.html",
+    "title": "Baseball Reference batting",
     "section": "",
-    "text": "This would be a great example of needing to dive into specific cells within a table to pull out bits. That said, it is not figured out here yet.",
+    "text": "This pulls standard batting statistics from baseball-reference.com. We want to tables “Player Standard Batting” which is downpage on this for 2024. There are actually two tables, one for regular season and one for playoffs. We want multiple seasons.",
     "crumbs": [
-      "Playbill"
+      "Baseball Reference batting"
     ]
   },
   {
-    "objectID": "playbill-grosses.html#setup",
-    "href": "playbill-grosses.html#setup",
-    "title": "Playbill",
+    "objectID": "s-bbref-batting.html#setup",
+    "href": "s-bbref-batting.html#setup",
+    "title": "Baseball Reference batting",
     "section": "Setup",
     "text": "Setup\n\nlibrary(tidyverse)\nlibrary(janitor)\nlibrary(rvest)",
     "crumbs": [
-      "Playbill"
+      "Baseball Reference batting"
     ]
   },
   {
-    "objectID": "playbill-grosses.html#basic-scrape",
-    "href": "playbill-grosses.html#basic-scrape",
-    "title": "Playbill",
-    "section": "Basic scrape",
-    "text": "Basic scrape\nCreate a url based on the week\n\nweek &lt;- \"2024-10-13\"\n\nurl &lt;- paste0(\"https://playbill.com/grosses?week=\",week)\nurl\n\n[1] \"https://playbill.com/grosses?week=2024-10-13\"\n\n\nRead in the url to get the page\n\nraw &lt;- read_html(url)\n\nraw\n\n{html_document}\n&lt;html lang=\"en\"&gt;\n[1] &lt;head&gt;\\n&lt;meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8 ...\n[2] &lt;body class=\"ua-desktop bsp-site-header-slidingnav \" style=\"\" data-dl-act ...\n\n\nFind the table and get its contents.\n\nmain_table &lt;- raw |&gt; html_element(\".bsp-table\") |&gt;  html_table()\n\nmain_table\n\n\n  \n\n\n\nThis works but it is a really shitty table that needs a don of cleaning. See potential refactor section below.",
+    "objectID": "s-bbref-batting.html#demonstrate-pulling-a-single-year",
+    "href": "s-bbref-batting.html#demonstrate-pulling-a-single-year",
+    "title": "Baseball Reference batting",
+    "section": "Demonstrate pulling a single year",
+    "text": "Demonstrate pulling a single year\n\nbr_year &lt;- 2023\n\n# Builds the url for the standard batting page\nurl &lt;- paste0(\"https://www.baseball-reference.com/leagues/majors/\", br_year, \"-standard-batting.shtml\")\n\nurl\n\n[1] \"https://www.baseball-reference.com/leagues/majors/2023-standard-batting.shtml\"\n\n\nThen we get all the tables on the page to see what they look like. We don’t actually use this object later, but it shows that you can build a list of tables.\n\n# reads in the HTML\nbr_batting_raw &lt;- read_html(url)\n\nbr_batting_raw\n\n{html_document}\n&lt;html data-version=\"klecko-\" data-root=\"/home/br/build\" lang=\"en\" class=\"no-js\"&gt;\n[1] &lt;head&gt;\\n&lt;meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8 ...\n[2] &lt;body class=\"br\"&gt;\\n&lt;div id=\"wrap\"&gt;\\n  \\n  &lt;div id=\"header\" role=\"banner\"&gt; ...\n\n\nThat just shows we are getting the HTML of the page.",
     "crumbs": [
-      "Playbill"
+      "Baseball Reference batting"
     ]
   },
   {
-    "objectID": "playbill-grosses.html#export",
-    "href": "playbill-grosses.html#export",
-    "title": "Playbill",
-    "section": "Export",
-    "text": "Export\nExporting this awful table into a folder called playbill to keep it away from other things.\n\nexport_path &lt;- paste0(\"data-raw/playbill/playbill_\",week,\".rds\")\n  \nexport_path\n\n[1] \"data-raw/playbill/playbill_2024-10-13.rds\"\n\nmain_table |&gt; write_rds(export_path)",
+    "objectID": "s-bbref-batting.html#plucking-out-tables",
+    "href": "s-bbref-batting.html#plucking-out-tables",
+    "title": "Baseball Reference batting",
+    "section": "Plucking out tables",
+    "text": "Plucking out tables\nWe could get all the tables with html_table()\n\nall_tables &lt;- br_batting_raw |&gt; html_table()\n\nall_tables\n\n[[1]]\n# A tibble: 33 × 29\n   Tm        `#Bat` BatAge `R/G` G     PA    AB    R     H     `2B`  `3B`  HR   \n   &lt;chr&gt;     &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;\n 1 Arizona … 54     27.4   4.60  162   6124  5436  746   1359  274   44    166  \n 2 Atlanta … 53     27.9   5.85  162   6249  5597  947   1543  293   23    307  \n 3 Baltimor… 50     27.2   4.98  162   6123  5495  807   1399  309   28    183  \n 4 Boston R… 56     28.6   4.77  162   6174  5562  772   1437  339   19    182  \n 5 Chicago … 48     28.4   5.06  162   6220  5504  819   1399  269   30    196  \n 6 Chicago … 56     27.8   3.96  162   5980  5501  641   1308  264   13    171  \n 7 Cincinna… 65     26.8   4.83  162   6195  5499  783   1371  268   37    198  \n 8 Clevelan… 50     26.6   4.09  162   6096  5513  662   1379  294   29    124  \n 9 Colorado… 57     28.1   4.45  162   6055  5496  721   1368  305   31    163  \n10 Detroit … 51     27.4   4.08  162   6080  5478  661   1292  245   29    165  \n# ℹ 23 more rows\n# ℹ 17 more variables: RBI &lt;chr&gt;, SB &lt;chr&gt;, CS &lt;chr&gt;, BB &lt;chr&gt;, SO &lt;chr&gt;,\n#   BA &lt;chr&gt;, OBP &lt;chr&gt;, SLG &lt;chr&gt;, OPS &lt;chr&gt;, `OPS+` &lt;chr&gt;, TB &lt;chr&gt;,\n#   GDP &lt;chr&gt;, HBP &lt;chr&gt;, SH &lt;chr&gt;, SF &lt;chr&gt;, IBB &lt;chr&gt;, LOB &lt;chr&gt;\n\n[[2]]\n# A tibble: 881 × 34\n      Rk Player        Age Team  Lg      WAR     G    PA    AB     R     H  `2B`\n   &lt;int&gt; &lt;chr&gt;       &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;\n 1     1 Marcus Sem…    32 TEX   AL      7.4   162   753   670   122   185    40\n 2     2 Ronald Acu…    25 ATL   NL      8.2   159   735   643   149   217    35\n 3     3 Freddie Fr…    33 LAD   NL      6.5   161   730   637   131   211    59\n 4     4 Alex Bregm…    29 HOU   AL      4.9   161   724   622   103   163    28\n 5     5 Nathaniel …    27 TEX   AL      2.6   161   724   623    89   163    38\n 6     6 Matt Olson*    29 ATL   NL      7.4   162   720   608   127   172    27\n 7     7 Kyle Schwa…    30 PHI   NL      0.6   160   720   585   108   115    19\n 8     8 Steven Kwa…    25 CLE   AL      3.6   158   718   638    93   171    36\n 9     9 Austin Ril…    26 ATL   NL      5.9   159   715   636   117   179    32\n10    10 Julio Rodr…    22 SEA   AL      5.3   155   714   654   102   180    37\n# ℹ 871 more rows\n# ℹ 22 more variables: `3B` &lt;int&gt;, HR &lt;int&gt;, RBI &lt;int&gt;, SB &lt;int&gt;, CS &lt;int&gt;,\n#   BB &lt;int&gt;, SO &lt;int&gt;, BA &lt;dbl&gt;, OBP &lt;dbl&gt;, SLG &lt;dbl&gt;, OPS &lt;dbl&gt;,\n#   `OPS+` &lt;int&gt;, rOBA &lt;dbl&gt;, `Rbat+` &lt;int&gt;, TB &lt;int&gt;, GIDP &lt;int&gt;, HBP &lt;int&gt;,\n#   SH &lt;int&gt;, SF &lt;int&gt;, IBB &lt;int&gt;, Pos &lt;chr&gt;, Awards &lt;chr&gt;\n\n[[3]]\n# A tibble: 293 × 30\n      Rk Player        Age Team  Lg        G    PA    AB     R     H  `2B`  `3B`\n   &lt;int&gt; &lt;chr&gt;       &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;\n 1     1 Corey Seag…    29 TEX   AL,WS    17    82    66    18    20     6     0\n 2     2 Marcus Sem…    32 TEX   AL,WS    17    82    76    12    17     2     1\n 3     3 Ketel Mart…    29 ARI   NL,WS    17    79    73     6    24     7     1\n 4     4 Corbin Car…    22 ARI   NL,WS    17    78    66    11    18     1     1\n 5     5 Christian …    32 ARI   NL,WS    17    75    60     7    13     5     0\n 6     6 Evan Carte…    20 TEX   AL,WS    17    72    60     9    18     9     0\n 7     7 Nathaniel …    27 TEX   AL,WS    17    72    66    10    14     2     0\n 8     8 Jonah Heim#    28 TEX   AL,WS    17    71    66     5    14     0     0\n 9     9 Lourdes Gu…    29 ARI   NL,WS    17    70    66     5    18     3     0\n10    10 Josh Jung      25 TEX   AL,WS    17    70    65    13    20     4     1\n# ℹ 283 more rows\n# ℹ 18 more variables: HR &lt;int&gt;, RBI &lt;int&gt;, SB &lt;int&gt;, CS &lt;int&gt;, BB &lt;int&gt;,\n#   SO &lt;int&gt;, BA &lt;dbl&gt;, OBP &lt;dbl&gt;, SLG &lt;dbl&gt;, OPS &lt;dbl&gt;, TB &lt;int&gt;, GIDP &lt;int&gt;,\n#   HBP &lt;int&gt;, SH &lt;int&gt;, SF &lt;int&gt;, IBB &lt;int&gt;, Pos &lt;chr&gt;, Awards &lt;chr&gt;\n\n\nIf I then wanted the second table, I could use.\n\nall_tables[[2]]\n\n\n  \n\n\n\nInstead, I wanted to find the specific table more precisely by keying in on a specific element in the HTML code. I found that the batting tables I wanted had the id players_standard_batting and players_standard_batting_post. I can use the html_element function to find the specific table I want, then use html_table to convert it to a data frame.\nI do some other things to clean up the data, like renaming columns, adding a season and season_type (regular vs playoffs).\n\n# finds the regular season batting table\n# cleans names, adds year, add season type\nbr_batting_reg &lt;- br_batting_raw |&gt; \n  html_element(\"#players_standard_batting\") |&gt;\n  html_table() |&gt; \n  clean_names() |&gt; \n  mutate(\n    season = br_year,\n    season_type = \"Regular\",\n    .before = rk\n  )\n\n# finds the playoff batting table\n# cleans names, adds year, add season type\nbr_batting_post &lt;- br_batting_raw |&gt; \n  html_element(\"#players_standard_batting_post\") |&gt;\n  html_table() |&gt; \n  clean_names() |&gt; \n  mutate(\n    season = br_year,\n    season_type = \"Playoffs\",\n    .before = rk\n  )\n\nbr_batting_reg",
     "crumbs": [
-      "Playbill"
+      "Baseball Reference batting"
     ]
   },
   {
-    "objectID": "playbill-grosses.html#refactoring-this-code",
-    "href": "playbill-grosses.html#refactoring-this-code",
-    "title": "Playbill",
-    "section": "Refactoring this code",
-    "text": "Refactoring this code\nThis “works” but the table is formatted in such a way that there are probably better (but more complicated) ways to pull out the data more cleanly, especially form columns like the first one that have the name and theater in the same td. Those have data labels and such.\nI just don’t know if it would be better. It would take some work to find out.\n&lt;td data-label=\"Show\" class=\"col-0\"&gt;\n  &lt;a href=\"https://playbill.com/production/gross?production=c3b6dace-a78e-439f-b3f2-bde3381bc6ff\" data-cms-ai=\"0\" rel=\"external\"&gt;\n    &lt;span class=\"data-value\"&gt;&amp; Juliet&lt;/span&gt;\n  &lt;/a&gt;\n  &lt;span class=\"subtext\"&gt;Stephen Sondheim Theatre&lt;/span&gt;\n&lt;/td&gt;",
+    "objectID": "s-bbref-batting.html#export-the-data",
+    "href": "s-bbref-batting.html#export-the-data",
+    "title": "Baseball Reference batting",
+    "section": "Export the data",
+    "text": "Export the data\nNow that I have that data, I can export it to a file.\nI’m using the paste0 function to build the file name based on the year I’m working with.\n\nexport_url_reg &lt;- paste0(\"data-raw/batting/br_bat_reg_\", br_year, \".rds\")\nexport_url_post &lt;- paste0(\"data-raw/batting/br_bat_post_\", br_year, \".rds\")\n\nexport_url_reg\n\n[1] \"data-raw/batting/br_bat_reg_2023.rds\"\n\nexport_url_post\n\n[1] \"data-raw/batting/br_bat_post_2023.rds\"\n\n\nAnd then I export ..\n\nbr_batting_reg |&gt; write_rds(export_url_reg)\nbr_batting_post |&gt; write_rds(export_url_post)",
     "crumbs": [
-      "Playbill"
+      "Baseball Reference batting"
     ]
   },
   {
-    "objectID": "longhorn-soccer-stats.html",
-    "href": "longhorn-soccer-stats.html",
+    "objectID": "s-bbref-batting.html#create-scraping-function",
+    "href": "s-bbref-batting.html#create-scraping-function",
+    "title": "Baseball Reference batting",
+    "section": "Create scraping function",
+    "text": "Create scraping function\nHere we turn what we learned above into a function so we can loop through a range of years.\n\nscrape_batting &lt;- function(br_year) {\n\n  # Builds the url for the standard batting page\n  url &lt;- paste0(\"https://www.baseball-reference.com/leagues/majors/\", br_year, \"-standard-batting.shtml\")\n  \n  # reads in the HTML\n  br_batting_raw &lt;- read_html(url)\n  \n  # finds the regular season batting table\n  # cleans names, adds year, add season type\n  br_batting_reg &lt;- br_batting_raw |&gt; \n    html_element(\"#players_standard_batting\") |&gt;\n    html_table() |&gt; \n    clean_names() |&gt; \n    mutate(\n      season = br_year,\n      season_type = \"Regular\",\n      .before = rk\n    )\n  \n  # finds the playoff batting table\n  # cleans names, adds year, add season type\n  br_batting_post &lt;- br_batting_raw |&gt; \n    html_element(\"#players_standard_batting_post\") |&gt;\n    html_table() |&gt; \n    clean_names() |&gt; \n    mutate(\n      season = br_year,\n      season_type = \"Playoffs\",\n      .before = rk\n    )\n  \n  # builds the export path for each based on year\n  export_url_reg &lt;- paste0(\"data-raw/batting/br_bat_reg_\", br_year, \".rds\")\n  export_url_post &lt;- paste0(\"data-raw/batting/br_bat_post_\", br_year, \".rds\")\n  \n  # the actual export\n  br_batting_reg |&gt; write_rds(export_url_reg)\n  br_batting_post |&gt; write_rds(export_url_post)\n\n}",
+    "crumbs": [
+      "Baseball Reference batting"
+    ]
+  },
+  {
+    "objectID": "s-bbref-batting.html#do-the-deed",
+    "href": "s-bbref-batting.html#do-the-deed",
+    "title": "Baseball Reference batting",
+    "section": "Do the deed",
+    "text": "Do the deed\nHere I’m pulling just three years, but it could be extended.\n\n# Sets a range of years to collect\nyrs &lt;- c(2000:2003)\n\n# Creates a loop to get those files\nfor (i in yrs) {\n  scrape_batting(i)\n}",
+    "crumbs": [
+      "Baseball Reference batting"
+    ]
+  },
+  {
+    "objectID": "s-ut-soccer-stats.html",
+    "href": "s-ut-soccer-stats.html",
     "title": "Longhorn Soccer Stats",
     "section": "",
     "text": "The goal here is to scrape individual and goalkeeper stats from the University of Texas women’s soccer team web pages. The data is stored in tables on the “Box Score” page for each game. The data is then cleaned and exported as RDS files.\nThose files will have to be imported and combined, and then cleaned up before analysis.",
@@ -210,8 +200,8 @@
     ]
   },
   {
-    "objectID": "longhorn-soccer-stats.html#of-note",
-    "href": "longhorn-soccer-stats.html#of-note",
+    "objectID": "s-ut-soccer-stats.html#of-note",
+    "href": "s-ut-soccer-stats.html#of-note",
     "title": "Longhorn Soccer Stats",
     "section": "Of note",
     "text": "Of note\nThis creates two files for each game (player stats and goalkeeper stats) and exports them as rds files. The idea is those files could be combined in a later script and further cleaning done.\nThis could be refactored to pull all the URLs from a schedule page and then run through a Github action to collect the data each week.",
@@ -220,8 +210,8 @@
     ]
   },
   {
-    "objectID": "longhorn-soccer-stats.html#things-to-collect-from-each-page",
-    "href": "longhorn-soccer-stats.html#things-to-collect-from-each-page",
+    "objectID": "s-ut-soccer-stats.html#things-to-collect-from-each-page",
+    "href": "s-ut-soccer-stats.html#things-to-collect-from-each-page",
     "title": "Longhorn Soccer Stats",
     "section": "Things to collect from each page",
     "text": "Things to collect from each page\n\nThe date of the game\nThe location of the game\nThe visiting team\nThe home team\nIndividual stats for visitors\nGoalkeeping stats for visitors\nIndividual stats for home team\nGoalkeeping stats for home team",
@@ -230,8 +220,8 @@
     ]
   },
   {
-    "objectID": "longhorn-soccer-stats.html#some-pages-to-test",
-    "href": "longhorn-soccer-stats.html#some-pages-to-test",
+    "objectID": "s-ut-soccer-stats.html#some-pages-to-test",
+    "href": "s-ut-soccer-stats.html#some-pages-to-test",
     "title": "Longhorn Soccer Stats",
     "section": "Some pages to test",
     "text": "Some pages to test\n\nHouston vs Texas is a 2024 home game.\nTexas vs SMU is a 2024 road game.\nTexas vs Florida St. is a 2023 post-season match.\nIncarnate Word vs Texas is a game from a previous year. It also doesn’t have “Cautions and Ejections” which revealed I needed a better way to pick out the correct tables.",
@@ -240,8 +230,8 @@
     ]
   },
   {
-    "objectID": "longhorn-soccer-stats.html#setup",
-    "href": "longhorn-soccer-stats.html#setup",
+    "objectID": "s-ut-soccer-stats.html#setup",
+    "href": "s-ut-soccer-stats.html#setup",
     "title": "Longhorn Soccer Stats",
     "section": "Setup",
     "text": "Setup\n\nlibrary(tidyverse)\nlibrary(janitor)\nlibrary(rvest)",
@@ -250,8 +240,8 @@
     ]
   },
   {
-    "objectID": "longhorn-soccer-stats.html#functions",
-    "href": "longhorn-soccer-stats.html#functions",
+    "objectID": "s-ut-soccer-stats.html#functions",
+    "href": "s-ut-soccer-stats.html#functions",
     "title": "Longhorn Soccer Stats",
     "section": "Functions",
     "text": "Functions\nOnce I figured out how to do all this, I turned the process into a function that can be fed a list of URLs to make files for each match.\n\nScrape stats function\nThis combines all the processing worked out below and turns it into a function so we can feed a list of URLs to make all the files.\n\nscrape_stats &lt;- function(file_url) {\n  # reads in URL\n  game_stats_raw &lt;- read_html(file_url)\n  \n  # pulls game details from description list\n  m_details &lt;- game_stats_raw |&gt; html_nodes(\"dd\") |&gt; html_text()\n  \n  # creates variables for game details\n  m_date &lt;- m_details[[1]] |&gt; mdy()\n  m_site &lt;- m_details[[3]]\n  m_stadium &lt;- m_details[[4]]\n  \n  # pulls who is visitor vs home\n  subheads &lt;- game_stats_raw |&gt; html_nodes(\".sub-heading\") |&gt; html_text()\n  \n  # creates lists of team names and scores\n  v_team_score &lt;- subheads[[4]] |&gt; str_split(\" \") |&gt; unlist()\n  h_team_score &lt;- subheads[[5]] |&gt; str_split(\" \") |&gt; unlist()\n  \n  # creates variables for visitor/home team names and scores\n  v_team &lt;- v_team_score[[1]]\n  v_score &lt;- v_team_score[[2]] |&gt; parse_number()\n  h_team &lt;- h_team_score[[1]]\n  h_score &lt;- h_team_score[[2]] |&gt; parse_number()\n  \n  # A function to handle some player stats cleaning\n  clean_indi_stats &lt;- function(df) {\n    df |&gt; mutate(\n    start = case_when(\n      player == \"Starters\" ~ \"Starter\",\n      player == \"Substitutes\" ~ \"Substitute\",\n      player == \"Totals\" ~ \"Total\",\n      .default = NA\n    ), .after = pos,\n  ) |&gt; fill(start) |&gt; \n    filter(!player %in% c(\"Starters\", \"Substitutes\", \"Totals\")) |&gt; \n    mutate(\n      date = m_date,\n      site = m_site,\n    )\n  }\n  \n  # creates list of individual stats tables\n  game_stats_tables &lt;- game_stats_raw |&gt; html_elements(\"section#individual-stats\") |&gt; minimal_html() |&gt; html_table()\n  \n  # gets each table type depending on visitor/home\n  v_pl_raw &lt;- game_stats_tables[[1]] |&gt; clean_names()\n  v_gk_raw &lt;- game_stats_tables[[2]] |&gt; clean_names()\n  h_pl_raw &lt;- game_stats_tables[[3]] |&gt; clean_names()\n  h_gk_raw &lt;- game_stats_tables[[4]] |&gt; clean_names()\n  \n  # adds team names to individual stats\n  v_pl &lt;- v_pl_raw |&gt; \n    clean_indi_stats() |&gt; \n    mutate(team = v_team, vs = h_team)\n  \n  h_pl &lt;- h_pl_raw |&gt; \n    clean_indi_stats() |&gt; \n    mutate(team = h_team, vs = v_team)\n  \n  # combines visitor/home data into one table\n  pl &lt;- bind_rows(v_pl, h_pl)\n  \n  # adds game details and team names to goalkeeping stats: visitors\n  v_gk &lt;- v_gk_raw |&gt;\n    filter(!goalie %in% c(\"Goalkeeping\", \"Totals\")) |&gt; \n    mutate(team = v_team, vs = h_team, date = m_date, site = m_site)\n  \n  # adds game details and team names to goalkeeping stats: home\n  h_gk &lt;- h_gk_raw |&gt;\n    filter(!goalie %in% c(\"Goalkeeping\", \"Totals\")) |&gt; \n    mutate(team = h_team, vs = v_team, date = m_date, site = m_site)\n\n  # combines goalkeeper stats\n  gk &lt;- bind_rows(v_gk, h_gk)\n  \n  # preps file names for export based on matchup\n  file_name_prefix &lt;- paste(m_date, v_team, h_team, sep = \"_\") |&gt; str_replace_all(\" \", \"_\") |&gt; str_replace_all(\"/\", \"-\")\n  \n  pl_export_path &lt;- paste(\"data-raw/soccer/\", \"pl_\", file_name_prefix, \".rds\", sep = \"\")\n  gk_export_path &lt;- paste(\"data-raw/soccer/\", \"gk_\", file_name_prefix, \".rds\", sep = \"\")\n\n  # exports files\n  pl |&gt; write_rds(pl_export_path)\n  gk |&gt; write_rds(gk_export_path)\n}\n\nThis is a test of a single file. Commented for now.\n\n# scrape_stats(\"https://texaslonghorns.com/sports/womens-soccer/stats/2024/houston/boxscore/16304\")\n\n\n\nBuild list of files to process\nThis should be refactored to use a schedule page to get all the URLs to the box score pages, but I don’t have that in me right now.\n\nurl_list &lt;- c(\n  \"https://texaslonghorns.com/sports/womens-soccer/stats/2024/houston/boxscore/16304\",\n  \"https://texaslonghorns.com/sports/womens-soccer/stats/2024/smu/boxscore/16306\",\n  \"https://texaslonghorns.com/sports/womens-soccer/stats/2024/cal-state-bakersfield/boxscore/16305\",\n  \"https://texaslonghorns.com/sports/womens-soccer/stats/2023/florida-state/boxscore/16066\",\n  \"https://texaslonghorns.com/sports/womens-soccer/stats/2022/incarnate-word-exhibition-/boxscore/14935\"\n)\n\n\n\nProcess all the files\nThis uses map to process all the files.\n\nurl_list |&gt; map(scrape_stats)\n\nWarning: 1 parsing failure.\nrow col expected      actual\n  1  -- a number Bakersfield\n\n\nWarning: 1 parsing failure.\nrow col expected actual\n  1  -- a number    St.\n\n\n[[1]]\n# A tibble: 2 × 10\n  position number goalie        minutes ga    saves team  vs    date       site \n  &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;         &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;date&gt;     &lt;chr&gt;\n1 GK       1      Dietrich, Ol… 90:00   1     7     Hous… Texas 2024-08-15 Aust…\n2 GK       1      Justus, Mia   90:00   0     3     Texas Hous… 2024-08-15 Aust…\n\n[[2]]\n# A tibble: 3 × 10\n  position number goalie        minutes ga    saves team  vs    date       site \n  &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;         &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;date&gt;     &lt;chr&gt;\n1 GK       1      Justus, Mia   90:00   3     5     Texas SMU   2024-08-22 Dall…\n2 GK       1      Brown, Aubrey 45:00   2     2     SMU   Texas 2024-08-22 Dall…\n3 GK       30     Cota-Yarde, … 45:00   4     2     SMU   Texas 2024-08-22 Dall…\n\n[[3]]\n# A tibble: 2 × 10\n  position number goalie        minutes ga    saves team  vs    date       site \n  &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;         &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;date&gt;     &lt;chr&gt;\n1 GK       00     Hercik, Holl… 90:00   4     15    CSU   Texas 2024-08-18 Aust…\n2 GK       1      Justus, Mia   90:00   0     4     Texas CSU   2024-08-18 Aust…\n\n[[4]]\n# A tibble: 2 × 10\n  position number goalie        minutes ga    saves team  vs    date       site \n  &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;         &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;date&gt;     &lt;chr&gt;\n1 GK       1      Justus, Mia   90:00   5     4     Texas Flor… 2023-11-19 Tall…\n2 GK       1      Roque, Crist… 90:00   0     3     Flor… Texas 2023-11-19 Tall…\n\n[[5]]\n# A tibble: 2 × 10\n  position number goalie        minutes ga    saves team  vs    date       site \n  &lt;chr&gt;    &lt;chr&gt;  &lt;chr&gt;         &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;date&gt;     &lt;chr&gt;\n1 GK       1      Hall, Makenz… 90:00   7     4     UIW   Texas 2022-08-12 Aust…\n2 GK       0      Madden, Sava… 90:00   0     4     Texas UIW   2022-08-12 Aust…",
@@ -260,14 +250,31 @@
     ]
   },
   {
-    "objectID": "longhorn-soccer-stats.html#working-out-details",
-    "href": "longhorn-soccer-stats.html#working-out-details",
+    "objectID": "s-ut-soccer-stats.html#working-out-details",
+    "href": "s-ut-soccer-stats.html#working-out-details",
     "title": "Longhorn Soccer Stats",
     "section": "Working out details",
     "text": "Working out details\nThis is the code I used to work out the process function above.\n\nGet the raw HTML\n\ngame_stats_raw &lt;- read_html(\"https://texaslonghorns.com/sports/womens-soccer/stats/2024/houston/boxscore/16304\")\n\n\n\nMatch details\nWe pull these from a description list on the main “Box Score” page.\n\nm_details &lt;- game_stats_raw |&gt; html_nodes(\"dd\") |&gt; html_text()\n\nm_date &lt;- m_details[[1]] |&gt; mdy()\nm_site &lt;- m_details[[3]]\nm_stadium &lt;- m_details[[4]]\n\n\n\nTeams and scores\nWe get these from the subheads on the “Individual” page.\n\nsubheads &lt;- game_stats_raw |&gt; html_nodes(\".sub-heading\") |&gt; html_text()\n\nv_team_score &lt;- subheads[[4]] |&gt; str_split(\" \") |&gt; unlist()\nh_team_score &lt;- subheads[[5]] |&gt; str_split(\" \") |&gt; unlist()\n\nv_team &lt;- v_team_score[[1]]\nv_score &lt;- v_team_score[[2]] |&gt; parse_number()\nh_team &lt;- h_team_score[[1]]\nh_score &lt;- h_team_score[[2]] |&gt; parse_number()\n\npaste(\"Visiting team was\", v_team, \"and their score was\", v_score)\n\n[1] \"Visiting team was Houston and their score was 0\"\n\npaste(\"Home team was\", h_team, \"and their score was\", h_score)\n\n[1] \"Home team was Texas and their score was 1\"\n\n\n\n\nIndividual stats\nThere are four separate tables we need that are displayed on the “Individual” tab.\n\nGet the tables\n\ngame_stats_tables &lt;- game_stats_raw |&gt; html_elements(\"section#individual-stats\") |&gt; minimal_html() |&gt; html_table()\n\ngame_stats_tables\n\n[[1]]\n# A tibble: 20 × 8\n   Pos           `#`           Player              SH    SOG   G     A     MIN  \n   &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;               &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;\n 1 \"Starters\"    \"Starters\"    \"Starters\"          Star… Star… Star… Star… \"Sta…\n 2 \"GK\"          \"1\"           \"1 \\r\\n           … 0     0     0     0     \"90\" \n 3 \"DEF\"         \"2\"           \"2 \\r\\n           … 0     0     0     0     \"90\" \n 4 \"FWD\"         \"3\"           \"3 \\r\\n           … 0     0     0     0     \"67\" \n 5 \"MID\"         \"5\"           \"5 \\r\\n           … 0     0     0     0     \"77\" \n 6 \"MID\"         \"10\"          \"10 \\r\\n          … 1     1     0     0     \"62\" \n 7 \"DEF\"         \"11\"          \"11 \\r\\n          … 0     0     0     0     \"22\" \n 8 \"DEF\"         \"12\"          \"12 \\r\\n          … 0     0     0     0     \"90\" \n 9 \"FWD\"         \"13\"          \"13 \\r\\n          … 1     0     0     0     \"69\" \n10 \"DEF\"         \"16\"          \"16 \\r\\n          … 0     0     0     0     \"74\" \n11 \"MID\"         \"18\"          \"18 \\r\\n          … 2     1     0     0     \"64\" \n12 \"FWD\"         \"26\"          \"26 \\r\\n          … 1     0     0     0     \"90\" \n13 \"Substitutes\" \"Substitutes\" \"Substitutes\"       Subs… Subs… Subs… Subs… \"Sub…\n14 \"mid\"         \"9\"           \"9 \\r\\n           … 0     0     0     0     \"5\"  \n15 \"mid\"         \"14\"          \"14 \\r\\n          … 0     0     0     0     \"13\" \n16 \"fwd\"         \"17\"          \"17 \\r\\n          … 0     0     0     0     \"28\" \n17 \"mid\"         \"19\"          \"19 \\r\\n          … 1     1     0     0     \"42\" \n18 \"mid\"         \"20\"          \"20 \\r\\n          … 0     0     0     0     \"39\" \n19 \"mid\"         \"24\"          \"24 \\r\\n          … 0     0     0     0     \"68\" \n20 \"\"            \"\"            \"Totals\"            6     3     0     0     \"\"   \n\n[[2]]\n# A tibble: 3 × 6\n  Position      `#`           Goalie           Minutes       GA          Saves  \n  &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;            &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt;  \n1 \"Goalkeeping\" \"Goalkeeping\" Goalkeeping      \"Goalkeeping\" Goalkeeping Goalke…\n2 \"GK\"          \"1\"           Dietrich, Olivia \"90:00\"       1           7      \n3 \"\"            \"\"            Totals           \"\"            1           7      \n\n[[3]]\n# A tibble: 19 × 8\n   Pos           `#`           Player              SH    SOG   G     A     MIN  \n   &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;               &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;\n 1 \"Starters\"    \"Starters\"    \"Starters\"          Star… Star… Star… Star… \"Sta…\n 2 \"GK\"          \"1\"           \"1 \\r\\n           … 0     0     0     0     \"90\" \n 3 \"DEF\"         \"8\"           \"8 \\r\\n           … 1     0     0     0     \"73\" \n 4 \"MID\"         \"9\"           \"9 \\r\\n           … 0     0     0     0     \"90\" \n 5 \"MID\"         \"10\"          \"10 \\r\\n          … 5     3     1     0     \"90\" \n 6 \"FWD\"         \"11\"          \"11 \\r\\n          … 0     0     0     0     \"53\" \n 7 \"DEF\"         \"12\"          \"12 \\r\\n          … 0     0     0     1     \"90\" \n 8 \"FWD\"         \"13\"          \"13 \\r\\n          … 4     1     0     0     \"61\" \n 9 \"FWD\"         \"15\"          \"15 \\r\\n          … 6     3     0     1     \"75\" \n10 \"DEF\"         \"23\"          \"23 \\r\\n          … 1     0     0     0     \"90\" \n11 \"DEF\"         \"25\"          \"25 \\r\\n          … 4     0     0     0     \"90\" \n12 \"MID\"         \"27\"          \"27 \\r\\n          … 1     0     0     0     \"70\" \n13 \"Substitutes\" \"Substitutes\" \"Substitutes\"       Subs… Subs… Subs… Subs… \"Sub…\n14 \"mid\"         \"4\"           \"4 \\r\\n           … 1     0     0     0     \"45\" \n15 \"def\"         \"5\"           \"5 \\r\\n           … 0     0     0     0     \"17\" \n16 \"fwd\"         \"7\"           \"7 \\r\\n           … 1     1     0     0     \"29\" \n17 \"fwd\"         \"16\"          \"16 \\r\\n          … 0     0     0     0     \"20\" \n18 \"fwd\"         \"44\"          \"44 \\r\\n          … 0     0     0     0     \"7\"  \n19 \"\"            \"\"            \"Totals\"            24    8     1     2     \"\"   \n\n[[4]]\n# A tibble: 3 × 6\n  Position      `#`           Goalie      Minutes       GA          Saves      \n  &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt;      \n1 \"Goalkeeping\" \"Goalkeeping\" Goalkeeping \"Goalkeeping\" Goalkeeping Goalkeeping\n2 \"GK\"          \"1\"           Justus, Mia \"90:00\"       0           3          \n3 \"\"            \"\"            Totals      \"\"            0           3          \n\n\n\n\nSaves specific tables we need\n\nv_pl_raw &lt;- game_stats_tables[[1]] |&gt; clean_names()\nv_gk_raw &lt;- game_stats_tables[[2]] |&gt; clean_names()\nh_pl_raw &lt;- game_stats_tables[[3]] |&gt; clean_names()\nh_gk_raw &lt;- game_stats_tables[[4]] |&gt; clean_names()\n\n\n\nClean individual stats\nA function to clean stats …\n\nAdds column to indicate starters\nRemoves totals and other headers\n\n\n  # A function to handle some player stats cleaning\n  clean_indi_stats &lt;- function(df) {\n    df |&gt; mutate(\n    start = case_when(\n      player == \"Starters\" ~ \"Starter\",\n      player == \"Substitutes\" ~ \"Substitute\",\n      player == \"Totals\" ~ \"Total\",\n      .default = NA\n    ), .after = pos,\n  ) |&gt; fill(start) |&gt; \n    filter(!player %in% c(\"Starters\", \"Substitutes\", \"Totals\")) |&gt; \n    mutate(\n      date = m_date,\n      site = m_site,\n    )\n  }\n\nThis takes the individual stats and runs them through the cleaning function above and then adds home and away team values.\n\nv_pl &lt;- v_pl_raw |&gt; \n  clean_indi_stats() |&gt; \n  mutate(team = v_team, vs = h_team)\n\nv_pl\n\n\n  \n\n\n\n\nh_pl &lt;- h_pl_raw |&gt; \n  clean_indi_stats() |&gt; \n  mutate(team = h_team, vs = v_team)\n\nh_pl\n\n\n  \n\n\n\n\nCombine individual stats\nCombines the visitor/home two player stats\n\npl &lt;- bind_rows(v_pl, h_pl)\n\npl\n\n\n  \n\n\n\n\n\n\nClean goalkeeper stats\nThis is the same process as above, but for goalkeepers. It’s a little less complicated.\n\nv_gk &lt;- v_gk_raw |&gt;\n  filter(!goalie %in% c(\"Goalkeeping\", \"Totals\")) |&gt; \n  mutate(team = v_team, vs = h_team, date = m_date, site = m_site)\n\nh_gk &lt;- h_gk_raw |&gt;\n  filter(!goalie %in% c(\"Goalkeeping\", \"Totals\")) |&gt; \n  mutate(team = h_team, vs = v_team, date = m_date, site = m_site)\n\nv_gk\n\n\n  \n\n\nh_gk\n\n\n  \n\n\n\n\nCombine goalkeepers\n\ngk &lt;- bind_rows(v_gk, h_gk)\n\ngk\n\n\n  \n\n\n\n\n\n\n\nWriting the exports\nThe actual exports are commented out so we don’t overwrite what came from above.\n\nfile_name_prefix &lt;- paste(m_date, v_team, h_team, sep = \"_\") |&gt; str_replace_all(\" \", \"_\") |&gt; str_replace_all(\"/\", \"-\")\n\npl_export_path &lt;- paste(\"data-raw/soccer/\", \"pl_\", file_name_prefix, \".rds\", sep = \"\")\ngk_export_path &lt;- paste(\"data-raw/soccer/\", \"gk_\", file_name_prefix, \".rds\", sep = \"\")\n\npl_export_path\n\n[1] \"data-raw/soccer/pl_2024-08-15_Houston_Texas.rds\"\n\ngk_export_path\n\n[1] \"data-raw/soccer/gk_2024-08-15_Houston_Texas.rds\"\n\n## Commented so it doesn't write anything out\n# pl |&gt; write_rds(pl_export_path)\n# gk |&gt; write_rds(gk_export_path)",
     "crumbs": [
       "Longhorn Soccer Stats"
     ]
+  },
+  {
+    "objectID": "s-sref-cfb-heisman.html",
+    "href": "s-sref-cfb-heisman.html",
+    "title": "Heisman voting table",
+    "section": "",
+    "text": "library(tidyverse)\nlibrary(janitor)\nlibrary(rvest)\n\nThis could be modified like Baseball Reference batting to pull multiple years using a function.\n\nurl &lt;- \"https://www.sports-reference.com/cfb/awards/heisman-2023.html\"\n\n\nhf_2023 &lt;- read_html(url) |&gt; html_table()\n\nhf_2023 \n\n[[1]]\n# A tibble: 10 × 10\n      Rk Player               School Class Pos   `1st` `2nd` `3rd`   Tot Summary\n   &lt;int&gt; &lt;chr&gt;                &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt;  \n 1     1 Jayden Daniels*      LSU    SR    QB      503   217    86  2029 236 Cm…\n 2     2 Michael Penix Jr.*   Washi… SR    QB      292   341   143  1701 363 Cm…\n 3     3 Bo Nix*              Oregon SR    QB       51   205   322   885 364 Cm…\n 4     4 Marvin Harrison Jr.* Ohio … JR    WR       20    78   136   352 67 Rec…\n 5     5 Jordan Travis*       Flori… SR    QB        8    19    23    85 207 Cm…\n 6     6 Jalen Milroe*        Alaba… SO    QB        4     8    45    73 187 Cm…\n 7     7 Ollie Gordon*        Oklah… SO    RB        1     2    24    31 285 At…\n 8     8 Cody Schrader*       Misso… JR    RB        1     2    22    29 276 At…\n 9     9 Blake Corum*         Michi… SR    RB        3     2    15    28 258 At…\n10    10 J.J. McCarthy*       Michi… JR    QB        1     7     4    21 240 Cm…\n\nhf_2023 |&gt; write_rds(\"data-raw/heisman/hv-2023.rds\")",
+    "crumbs": [
+      "Heisman voting table"
+    ]
+  },
+  {
+    "objectID": "s-skating.html",
+    "href": "s-skating.html",
+    "title": "skating",
+    "section": "",
+    "text": "library(tidyverse)\nlibrary(janitor)\nlibrary(rvest)\n\n\ntables &lt;- read_html(\"https://skatingscores.com/1314/oly/sr/men/i/results/\") |&gt; html_table()\n\nskating &lt;- tables[[2]] |&gt; clean_names()\n\nskating |&gt; filter(nat == \"🇦🇹\")"
   },
   {
     "objectID": "index.html",
@@ -280,21 +287,31 @@
     ]
   },
   {
-    "objectID": "index.html#the-list-so-far",
-    "href": "index.html#the-list-so-far",
+    "objectID": "index.html#about-the-site",
+    "href": "index.html#about-the-site",
     "title": "Scraping examples in R",
-    "section": "The list so far",
-    "text": "The list so far\n\nPaginated tables\nTexas Longhorns Soccer Stats\nHeisman voting\nPlaybill grosses\nBaseball reference batting stats",
+    "section": "",
+    "text": "Scraping is challenging because every example is different. As I do different scraping projects, I’ll try to save examples in this repo.",
     "crumbs": [
       "Home"
     ]
   },
   {
-    "objectID": "index.html#other-resources",
-    "href": "index.html#other-resources",
+    "objectID": "index.html#the-list-so-far",
+    "href": "index.html#the-list-so-far",
     "title": "Scraping examples in R",
-    "section": "Other resources",
-    "text": "Other resources\n\nThe rvest package documentation.\nHadley Wickham’s web scraping tutorial. He presented this as a half-day session at NICAR24.\nMy Billboard Data repo uses Github Actions and rvest to scrape on a schedule.",
+    "section": "The list so far",
+    "text": "The list so far\n\nBaseball Reference batting\nPaginated tables\nPlaybill Grosses\nHeisman votes\nDeath row data\nUT Soccer stats",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#resources",
+    "href": "index.html#resources",
+    "title": "Scraping examples in R",
+    "section": "Resources",
+    "text": "Resources\n\nThe rvest package documentation.\nHadley Wickham’s web scraping tutorial. He presented this as a half-day session at NICAR24.\nMy Billboard Data repo uses Github Actions and rvest to scrape on a schedule.",
     "crumbs": [
       "Home"
     ]
@@ -307,6 +324,56 @@
     "text": "To do\nToo many to list, but I do want to learn polite and build in some wait time.",
     "crumbs": [
       "Home"
+    ]
+  },
+  {
+    "objectID": "s-playbill-grosses.html",
+    "href": "s-playbill-grosses.html",
+    "title": "Playbill",
+    "section": "",
+    "text": "This would be a great example of needing to dive into specific cells within a table to pull out bits. That said, it is not figured out here yet.",
+    "crumbs": [
+      "Playbill"
+    ]
+  },
+  {
+    "objectID": "s-playbill-grosses.html#setup",
+    "href": "s-playbill-grosses.html#setup",
+    "title": "Playbill",
+    "section": "Setup",
+    "text": "Setup\n\nlibrary(tidyverse)\nlibrary(janitor)\nlibrary(rvest)",
+    "crumbs": [
+      "Playbill"
+    ]
+  },
+  {
+    "objectID": "s-playbill-grosses.html#basic-scrape",
+    "href": "s-playbill-grosses.html#basic-scrape",
+    "title": "Playbill",
+    "section": "Basic scrape",
+    "text": "Basic scrape\nCreate a url based on the week\n\nweek &lt;- \"2024-10-13\"\n\nurl &lt;- paste0(\"https://playbill.com/grosses?week=\",week)\nurl\n\n[1] \"https://playbill.com/grosses?week=2024-10-13\"\n\n\nRead in the url to get the page\n\nraw &lt;- read_html(url)\n\nraw\n\n{html_document}\n&lt;html lang=\"en\"&gt;\n[1] &lt;head&gt;\\n&lt;meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8 ...\n[2] &lt;body class=\"ua-desktop bsp-site-header-slidingnav \" style=\"\" data-dl-act ...\n\n\nFind the table and get its contents.\n\nmain_table &lt;- raw |&gt; html_element(\".bsp-table\") |&gt;  html_table()\n\nmain_table\n\n\n  \n\n\n\nThis works but it is a really shitty table that needs a don of cleaning. See potential refactor section below.",
+    "crumbs": [
+      "Playbill"
+    ]
+  },
+  {
+    "objectID": "s-playbill-grosses.html#export",
+    "href": "s-playbill-grosses.html#export",
+    "title": "Playbill",
+    "section": "Export",
+    "text": "Export\nExporting this awful table into a folder called playbill to keep it away from other things.\n\nexport_path &lt;- paste0(\"data-raw/playbill/playbill_\",week,\".rds\")\n  \nexport_path\n\n[1] \"data-raw/playbill/playbill_2024-10-13.rds\"\n\nmain_table |&gt; write_rds(export_path)",
+    "crumbs": [
+      "Playbill"
+    ]
+  },
+  {
+    "objectID": "s-playbill-grosses.html#refactoring-this-code",
+    "href": "s-playbill-grosses.html#refactoring-this-code",
+    "title": "Playbill",
+    "section": "Refactoring this code",
+    "text": "Refactoring this code\nThis “works” but the table is formatted in such a way that there are probably better (but more complicated) ways to pull out the data more cleanly, especially form columns like the first one that have the name and theater in the same td. Those have data labels and such.\nI just don’t know if it would be better. It would take some work to find out.\n&lt;td data-label=\"Show\" class=\"col-0\"&gt;\n  &lt;a href=\"https://playbill.com/production/gross?production=c3b6dace-a78e-439f-b3f2-bde3381bc6ff\" data-cms-ai=\"0\" rel=\"external\"&gt;\n    &lt;span class=\"data-value\"&gt;&amp; Juliet&lt;/span&gt;\n  &lt;/a&gt;\n  &lt;span class=\"subtext\"&gt;Stephen Sondheim Theatre&lt;/span&gt;\n&lt;/td&gt;",
+    "crumbs": [
+      "Playbill"
     ]
   }
 ]

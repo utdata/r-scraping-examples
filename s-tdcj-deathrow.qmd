@@ -1,0 +1,66 @@
+---
+title: "Texas Death Row"
+---
+
+## Goals
+
+To scrape some data from a couple of urls on the Texas Department of Criminal Justice website.
+
+Yet another example using [rvest](https://rvest.tidyverse.org/).
+
+- [executed offenders](https://www.tdcj.texas.gov/death_row/dr_executed_offenders.html)
+- [death row offenders](https://www.tdcj.texas.gov/death_row/dr_offenders_on_dr.html)
+
+## Setup
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(janitor)
+library(rvest)
+```
+
+## Working through the exercise
+
+### Executed Offenders
+
+Get the HTML tables from the page
+
+```{r}
+#| label: scrape-executed
+
+# gets the tables from the page as a list
+executed_tables <- read_html("https://www.tdcj.texas.gov/death_row/dr_executed_offenders.html") |> 
+  html_table()
+
+# selects the first table from the list and cleans headers
+executed_raw <- executed_tables[[1]] |> clean_names()
+
+executed_raw
+```
+
+Do the same for the deathrow table.
+
+```{r}
+#| label: scrape-deathrow
+
+deathrow_tables <- read_html("https://www.tdcj.texas.gov/death_row/dr_offenders_on_dr.html") |> 
+  html_table()
+
+deathrow_raw <- deathrow_tables[[1]] |> clean_names()
+
+deathrow_raw
+```
+
+## Export the files
+
+```{r}
+#| label: export-files
+
+executed_raw |> write_rds("data-raw/tdcj/executed_raw.rds")
+deathrow_raw |> write_rds("data-raw/tdcj/deathrow_raw.rds")
+```
+

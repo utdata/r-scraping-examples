@@ -10,11 +10,12 @@ website:
     contents:
       - href: index.qmd
         text: Home
-      - paginated-tables.qmd
-      - longhorn-soccer-stats.qmd
-      - baseball-ref-batting.qmd
-      - playbill-grosses.qmd
-      - heisman-voting.qmd
+      - s-bbref-batting.qmd
+      - s-paginated-tables.qmd
+      - s-playbill-grosses.qmd
+      - s-sref-cfb-heisman.qmd
+      - s-tdcj-deathrow.qmd
+      - s-ut-soccer-stats.qmd
   repo-url: https://github.com/utdata/r-scraping-examples
   repo-actions: [source, issue]
 
