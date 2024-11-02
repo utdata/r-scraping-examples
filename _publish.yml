@@ -1,0 +1,4 @@
+- source: project
+  quarto-pub:
+    - id: a9a16569-5ddc-4d81-8097-d1b96aecd880
+      url: 'https://christianmcdonald.quarto.pub/scraping-examples'

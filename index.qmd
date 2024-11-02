@@ -14,7 +14,7 @@ Scraping is challenging because every example is different. As I do different sc
 - [Paginated tables](s-paginated-tables.qmd)
 - [Playbill Grosses](s-playbill-grosses.qmd)
 - [Heisman votes](s-sref-cfb-heisman.qmd)
-- [Death row data](s-tdch-deathrow.qmd)
+- [Death row data](s-tdcj-deathrow.qmd)
 - [UT Soccer stats](s-ut-soccer-stats.qmd)
 
 ## Resources
