@@ -29,6 +29,7 @@ This could be refactored to pull all the URLs from a schedule page and then run 
 - [Texas vs SMU](https://texaslonghorns.com/sports/womens-soccer/stats/2024/smu/boxscore/16306) is a 2024 road game.
 - [Texas vs Florida St.](https://texaslonghorns.com/sports/womens-soccer/stats/2023/florida-state/boxscore/16066) is a 2023 post-season match.
 - [Incarnate Word vs Texas](https://texaslonghorns.com/sports/womens-soccer/stats/2022/incarnate-word-exhibition-/boxscore/14935) is a game from a previous year. It also doesn't have "Cautions and Ejections" which revealed I needed a better way to pick out the correct tables.
+- [Iowa vs Texas](https://texaslonghorns.com/sports/womens-soccer/stats/2024/iowa/boxscore/16307) was causing problems because the number of subheads was different.
 
 ## Setup
 
@@ -66,12 +67,16 @@ scrape_stats <- function(file_url) {
   m_stadium <- m_details[[4]]
   
   # pulls who is visitor vs home
-  subheads <- game_stats_raw |> html_nodes(".sub-heading") |> html_text()
-  
+  # THIS IS UPDATED
+  subheads <- game_stats_raw |>
+    html_nodes("#individual-stats") |>
+    html_nodes(".sub-heading") |> html_text()
+
   # creates lists of team names and scores
-  v_team_score <- subheads[[4]] |> str_split(" ") |> unlist()
-  h_team_score <- subheads[[5]] |> str_split(" ") |> unlist()
-  
+  # THIS IS UPDATED
+  v_team_score <- subheads[[1]] |> str_split(" ") |> unlist()
+  h_team_score <- subheads[[2]] |> str_split(" ") |> unlist()
+
   # creates variables for visitor/home team names and scores
   v_team <- v_team_score[[1]]
   v_score <- v_team_score[[2]] |> parse_number()
@@ -141,10 +146,10 @@ scrape_stats <- function(file_url) {
 }
 ```
 
-This is a test of a single file. Commented for now.
+This is a test of a single file. This is showing it won't fail on the Iowa match.
 
 ```{r}
-# scrape_stats("https://texaslonghorns.com/sports/womens-soccer/stats/2024/houston/boxscore/16304")
+scrape_stats("https://texaslonghorns.com/sports/womens-soccer/stats/2024/iowa/boxscore/16307")
 ```
 
 
@@ -158,7 +163,8 @@ url_list <- c(
   "https://texaslonghorns.com/sports/womens-soccer/stats/2024/smu/boxscore/16306",
   "https://texaslonghorns.com/sports/womens-soccer/stats/2024/cal-state-bakersfield/boxscore/16305",
   "https://texaslonghorns.com/sports/womens-soccer/stats/2023/florida-state/boxscore/16066",
-  "https://texaslonghorns.com/sports/womens-soccer/stats/2022/incarnate-word-exhibition-/boxscore/14935"
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2022/incarnate-word-exhibition-/boxscore/14935",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/iowa/boxscore/16307"
 )
 ```
 
@@ -177,7 +183,7 @@ This is the code I used to work out the process function above.
 ### Get the raw HTML
 
 ```{r}
-game_stats_raw <- read_html("https://texaslonghorns.com/sports/womens-soccer/stats/2024/houston/boxscore/16304")
+game_stats_raw <- read_html("https://texaslonghorns.com/sports/womens-soccer/stats/2024/iowa/boxscore/16307")
 ```
 
 ### Match details
@@ -197,11 +203,14 @@ m_stadium <- m_details[[4]]
 
 We get these from the subheads on the "Individual" page.
 
-```{r}
-subheads <- game_stats_raw |> html_nodes(".sub-heading") |> html_text()
+#individual-stats > div > div:nth-child(1) > section > h3
 
-v_team_score <- subheads[[4]] |> str_split(" ") |> unlist()
-h_team_score <- subheads[[5]] |> str_split(" ") |> unlist()
+
+```{r}
+subheads <- game_stats_raw |> html_nodes("#individual-stats") |> html_nodes(".sub-heading") |> html_text()
+
+v_team_score <- subheads[[1]] |> str_split(" ") |> unlist()
+h_team_score <- subheads[[2]] |> str_split(" ") |> unlist()
 
 v_team <- v_team_score[[1]]
 v_score <- v_team_score[[2]] |> parse_number()
@@ -219,7 +228,9 @@ There are four separate tables we need that are displayed on the "Individual" ta
 #### Get the tables
 
 ```{r}
-game_stats_tables <- game_stats_raw |> html_elements("section#individual-stats") |> minimal_html() |> html_table()
+game_stats_tables <- game_stats_raw |>
+  html_elements("section#individual-stats")|>
+  minimal_html() |> html_table()
 
 game_stats_tables
 ```
