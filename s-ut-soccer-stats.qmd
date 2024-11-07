@@ -12,7 +12,9 @@ This creates two files for each game (player stats and goalkeeper stats) and exp
 
 This could be refactored to pull all the URLs from a schedule page and then run through a Github action to collect the data each week.
 
-## Things to collect from each page
+## What we want
+
+A list of the information we are trying to gather from each page.
 
 - The date of the game
 - The location of the game
@@ -29,7 +31,7 @@ This could be refactored to pull all the URLs from a schedule page and then run 
 - [Texas vs SMU](https://texaslonghorns.com/sports/womens-soccer/stats/2024/smu/boxscore/16306) is a 2024 road game.
 - [Texas vs Florida St.](https://texaslonghorns.com/sports/womens-soccer/stats/2023/florida-state/boxscore/16066) is a 2023 post-season match.
 - [Incarnate Word vs Texas](https://texaslonghorns.com/sports/womens-soccer/stats/2022/incarnate-word-exhibition-/boxscore/14935) is a game from a previous year. It also doesn't have "Cautions and Ejections" which revealed I needed a better way to pick out the correct tables.
-- [Iowa vs Texas](https://texaslonghorns.com/sports/womens-soccer/stats/2024/iowa/boxscore/16307) was causing problems because the number of subheads was different.
+- [Iowa vs Texas](https://texaslonghorns.com/sports/womens-soccer/stats/2024/iowa/boxscore/16307) also revealed I need to be more specific about where to find visiting/home team names.
 
 ## Setup
 
@@ -48,13 +50,16 @@ library(rvest)
 
 Once I figured out how to do all this, I turned the process into a function that can be fed a list of URLs to make files for each match.
 
-
 ### Scrape stats function
 
 This combines all the processing worked out below and turns it into a function so we can feed a list of URLs to make all the files.
 
 ```{r}
 scrape_stats <- function(file_url) {
+  
+  # A pause to avoid hammering servers
+  Sys.sleep(2)
+  
   # reads in URL
   game_stats_raw <- read_html(file_url)
   
@@ -152,23 +157,50 @@ This is a test of a single file. This is showing it won't fail on the Iowa match
 scrape_stats("https://texaslonghorns.com/sports/womens-soccer/stats/2024/iowa/boxscore/16307")
 ```
 
+### Testing the scrape
 
-### Build list of files to process
+#### Build list of files to process
 
 This should be refactored to use a [schedule page](https://texaslonghorns.com/sports/womens-soccer/schedule/2024) to get all the URLs to the box score pages, but I don't have that in me right now.
+
+This is a small list
 
 ```{r}
 url_list <- c(
   "https://texaslonghorns.com/sports/womens-soccer/stats/2024/houston/boxscore/16304",
   "https://texaslonghorns.com/sports/womens-soccer/stats/2024/smu/boxscore/16306",
-  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/cal-state-bakersfield/boxscore/16305",
-  "https://texaslonghorns.com/sports/womens-soccer/stats/2023/florida-state/boxscore/16066",
-  "https://texaslonghorns.com/sports/womens-soccer/stats/2022/incarnate-word-exhibition-/boxscore/14935",
   "https://texaslonghorns.com/sports/womens-soccer/stats/2024/iowa/boxscore/16307"
 )
 ```
 
-### Process all the files
+This is a longer list of the entire 2024 season.
+
+```{r}
+urls_2024 <- c(
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/houston/boxscore/16304",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/cal-state-bakersfield/boxscore/16305",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/smu/boxscore/16306",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/iowa/boxscore/16307",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/central-michigan/boxscore/16308",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/san-diego-state/boxscore/16309",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/long-beach-state/boxscore/16310",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/houston-christian/boxscore/16311",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/alabama/boxscore/16312",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/mississippi-state/boxscore/16313",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/ole-miss/boxscore/16314",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/texas-am/boxscore/16315",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/florida/boxscore/16316",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/oklahoma/boxscore/16317",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/lsu/boxscore/16318",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/arkansas/boxscore/16319",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/missouri/boxscore/16320",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/georgia/boxscore/16321"
+)
+
+```
+
+
+#### Process all the files
 
 This uses map to process all the files.
 
@@ -183,7 +215,7 @@ This is the code I used to work out the process function above.
 ### Get the raw HTML
 
 ```{r}
-game_stats_raw <- read_html("https://texaslonghorns.com/sports/womens-soccer/stats/2024/iowa/boxscore/16307")
+game_stats_raw <-  read_html("https://texaslonghorns.com/sports/womens-soccer/stats/2024/iowa/boxscore/16307")
 ```
 
 ### Match details
@@ -201,10 +233,7 @@ m_stadium <- m_details[[4]]
 
 ### Teams and scores
 
-We get these from the subheads on the "Individual" page.
-
-#individual-stats > div > div:nth-child(1) > section > h3
-
+We get these from the subheads on the "Individual" page. I had to target these pretty specifically by id and class to get the correct tables.
 
 ```{r}
 subheads <- game_stats_raw |> html_nodes("#individual-stats") |> html_nodes(".sub-heading") |> html_text()
@@ -248,7 +277,7 @@ h_gk_raw <- game_stats_tables[[4]] |> clean_names()
 
 A function to clean stats ...
 
-- Adds column to indicate starters
+- Adds a column to indicate starters vs subs
 - Removes totals and other headers
 
 ```{r}
@@ -289,7 +318,7 @@ h_pl <- h_pl_raw |>
 h_pl
 ```
 
-##### Combine individual stats
+#### Combine individual stats
 
 Combines the visitor/home two player stats
 
@@ -317,7 +346,7 @@ v_gk
 h_gk
 ```
 
-##### Combine goalkeepers
+#### Combine goalkeepers
 
 ```{r}
 gk <- bind_rows(v_gk, h_gk)
@@ -342,4 +371,5 @@ gk_export_path
 # pl |> write_rds(pl_export_path)
 # gk |> write_rds(gk_export_path)
 ```
+
 
