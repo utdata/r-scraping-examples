@@ -46,11 +46,9 @@ library(rvest)
 ```
 
 
-## Functions
+## Scrape stats function
 
 Once I figured out how to do all this, I turned the process into a function that can be fed a list of URLs to make files for each match.
-
-### Scrape stats function
 
 This combines all the processing worked out below and turns it into a function so we can feed a list of URLs to make all the files.
 
@@ -72,21 +70,26 @@ scrape_stats <- function(file_url) {
   m_stadium <- m_details[[4]]
   
   # pulls who is visitor vs home
-  # THIS IS UPDATED
-  subheads <- game_stats_raw |>
-    html_nodes("#individual-stats") |>
-    html_nodes(".sub-heading") |> html_text()
+  subheads <- game_stats_raw |> 
+    html_nodes("#individual-stats") |> 
+    html_nodes(".sub-heading") |>
+    html_text()
 
-  # creates lists of team names and scores
-  # THIS IS UPDATED
-  v_team_score <- subheads[[1]] |> str_split(" ") |> unlist()
-  h_team_score <- subheads[[2]] |> str_split(" ") |> unlist()
+  # UPDATES START HERE
 
-  # creates variables for visitor/home team names and scores
-  v_team <- v_team_score[[1]]
-  v_score <- v_team_score[[2]] |> parse_number()
-  h_team <- h_team_score[[1]]
-  h_score <- h_team_score[[2]] |> parse_number()
+  # Separates subheads into home/away team_score
+  v_team_score <- subheads[[1]]
+  h_team_score <- subheads[[2]]
+
+  # Removes ranks and scores to get team name
+  v_team <- v_team_score[[1]] |> str_remove(" \\d+$") |> str_remove("^#\\d+ ")
+  h_team <- h_team_score[[1]] |> str_remove(" \\d+$") |> str_remove("^#\\d+ ")
+
+  # extracts score from team_score
+  v_score <- v_team_score |> str_extract("\\d+$")
+  h_score <- h_team_score |> str_extract("\\d+$")
+
+  # UPDATES END HERE
   
   # A function to handle some player stats cleaning
   clean_indi_stats <- function(df) {
@@ -138,7 +141,7 @@ scrape_stats <- function(file_url) {
 
   # combines goalkeeper stats
   gk <- bind_rows(v_gk, h_gk)
-  
+
   # preps file names for export based on matchup
   file_name_prefix <- paste(m_date, v_team, h_team, sep = "_") |> str_replace_all(" ", "_") |> str_replace_all("/", "-")
   
@@ -151,32 +154,33 @@ scrape_stats <- function(file_url) {
 }
 ```
 
-This is a test of a single file. This is showing it won't fail on the Iowa match.
-
-```{r}
-scrape_stats("https://texaslonghorns.com/sports/womens-soccer/stats/2024/iowa/boxscore/16307")
-```
-
 ### Testing the scrape
 
-#### Build list of files to process
+> This concept could be refactored to use a [schedule page](https://texaslonghorns.com/sports/womens-soccer/schedule/2024) to get all the URLs to the box score pages, but I don't have that in me right now.
 
-This should be refactored to use a [schedule page](https://texaslonghorns.com/sports/womens-soccer/schedule/2024) to get all the URLs to the box score pages, but I don't have that in me right now.
+I first build a list of URLs to test the function. I'm building a couple of versions for convenience and to test some specific things.
+
+A single page
+
+```{r}
+url_one <- "https://texaslonghorns.com/sports/womens-soccer/stats/2024/texas-am/boxscore/16315"
+```
 
 This is a small list
 
 ```{r}
-url_list <- c(
+url_list_short <- c(
   "https://texaslonghorns.com/sports/womens-soccer/stats/2024/houston/boxscore/16304",
-  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/smu/boxscore/16306",
-  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/iowa/boxscore/16307"
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/iowa/boxscore/16307",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2015/north-carolina/boxscore/8819",
+  "https://texaslonghorns.com/sports/womens-soccer/stats/2024/texas-am/boxscore/16315"
 )
 ```
 
-This is a longer list of the entire 2024 season.
+This is a longer list of the entire 2024 season:
 
 ```{r}
-urls_2024 <- c(
+url_list_2024 <- c(
   "https://texaslonghorns.com/sports/womens-soccer/stats/2024/houston/boxscore/16304",
   "https://texaslonghorns.com/sports/womens-soccer/stats/2024/cal-state-bakersfield/boxscore/16305",
   "https://texaslonghorns.com/sports/womens-soccer/stats/2024/smu/boxscore/16306",
@@ -200,12 +204,12 @@ urls_2024 <- c(
 ```
 
 
-#### Process all the files
+### Process all the files
 
 This uses map to process all the files.
 
 ```{r}
-url_list |> map(scrape_stats)
+url_one |> map(scrape_stats)
 ```
 
 ## Working out details
@@ -215,7 +219,7 @@ This is the code I used to work out the process function above.
 ### Get the raw HTML
 
 ```{r}
-game_stats_raw <-  read_html("https://texaslonghorns.com/sports/womens-soccer/stats/2024/iowa/boxscore/16307")
+game_stats_raw <-  read_html("https://texaslonghorns.com/sports/womens-soccer/stats/2015/north-carolina/boxscore/8819")
 ```
 
 ### Match details
@@ -238,13 +242,14 @@ We get these from the subheads on the "Individual" page. I had to target these p
 ```{r}
 subheads <- game_stats_raw |> html_nodes("#individual-stats") |> html_nodes(".sub-heading") |> html_text()
 
-v_team_score <- subheads[[1]] |> str_split(" ") |> unlist()
-h_team_score <- subheads[[2]] |> str_split(" ") |> unlist()
+v_team_score <- subheads[[1]]
+h_team_score <- subheads[[2]]
 
-v_team <- v_team_score[[1]]
-v_score <- v_team_score[[2]] |> parse_number()
-h_team <- h_team_score[[1]]
-h_score <- h_team_score[[2]] |> parse_number()
+v_team <- v_team_score[[1]] |> str_remove(" \\d+$") |> str_remove("^#\\d+ ")
+h_team <- h_team_score[[1]] |> str_remove(" \\d+$") |> str_remove("^#\\d+ ")
+
+v_score <- v_team_score |> str_extract("\\d+$")
+h_score <- h_team_score |> str_extract("\\d+$")
 
 paste("Visiting team was", v_team, "and their score was", v_score)
 paste("Home team was", h_team, "and their score was", h_score)
