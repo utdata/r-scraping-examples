@@ -2,6 +2,12 @@
 title: "Heisman voting table"
 ---
 
+This gets the [Heisman Voting table](https://www.sports-reference.com/cfb/awards/heisman-1935.html) for each year in a list of years.
+
+While I could scrape and build the data all at once, I choose to save each scraped file to disc first so the scraping doesn't have to be rerun.
+
+## Setup
+
 ```{r}
 #| label: setup
 #| message: false
@@ -12,18 +18,94 @@ library(janitor)
 library(rvest)
 ```
 
-This could be modified like [Baseball Reference batting](s-bbref-batting.qmd) to pull multiple years using a function.
+## Figure out the scrape
 
-
-```{r}
-url <- "https://www.sports-reference.com/cfb/awards/heisman-2023.html"
-```
+Figuring out the scrape with one url.
 
 ```{r}
-hf_2023 <- read_html(url) |> html_table()
 
-hf_2023 
+url <- "https://www.sports-reference.com/cfb/awards/heisman-1935.html"
 
-hf_2023 |> write_rds("data-raw/heisman/hv-2023.rds")
+h_test <- read_html(url) |> html_node("#heisman") |> html_table()
+
+h_test
+
+h_test |> write_csv("data-raw/heisman/h_test.csv")
+
 ```
+
+## Make scraping a function
+
+Creates a function to scrape a page with this table with some time between scrapes so we don't blast the server. It saves the files into data-raw/heisman.
+
+```{r}
+scrape_heisman <- function(yr) {
+  # build the url
+  url <- paste0("https://www.sports-reference.com/cfb/awards/heisman-", yr, ".html")
+  
+  # Wait 2 seconds
+  Sys.sleep(2)
+  
+  # get the table
+  table <- read_html(url)  |> html_node("#heisman") |> html_table()
+  
+  # create an export url
+  export_url <- paste0("data-raw/heisman/hv-", yr, ".csv")
+  
+  # export the table
+  table |> write_csv(export_url)
+  }
+
+```
+
+Scrape all the years in a list. Doing only four years here.
+
+```{r}
+yrs <- c(2020:2023)
+
+# Creates a loop to get those files
+for (i in yrs) {
+  scrape_heisman(i)
+}
+```
+
+## Combine the files
+
+Makes a list of all the files that end with a digit then .csv.
+
+```{r}
+files_list <- list.files(
+  "data-raw/heisman",
+  pattern = "\\d.csv$",
+  full.names = TRUE
+)
+
+files_list
+```
+
+Takes that list and maps over them, applying read_csv while preserving the name of the file the data came from.
+
+```{r}
+#| message: false
+
+heisman_raw <- files_list |> 
+  set_names(basename) |>
+  map(read_csv) |> 
+  list_rbind(names_to = "source")
+
+heisman_raw
+```
+
+## Pull the year
+
+Uses str_sub to pull the year from the source column base on its position.
+
+```{r}
+heisman_year <- heisman_raw |> 
+  mutate(year = str_sub(source,4,7), .after = source)
+
+heisman_year
+```
+
+Now you can drop the `source` columns.
 
