@@ -4,6 +4,14 @@ title: "Baseball Reference batting"
 
 This pulls standard batting statistics from baseball-reference.com. We want to tables "Player Standard Batting" which is downpage on this for [2024](https://www.baseball-reference.com/leagues/majors/2024-standard-batting.shtml). There are actually two tables, one for regular season and one for playoffs. We want multiple seasons.
 
+In this examples, we create a variable for the year that we can set and rerun. Could reconfigure to send a vector of years, etc.
+
+::: callout
+
+It's possible this might be easier with [baseballr](https://billpetti.github.io/baseballr/) which also accesses <https://baseball-reference.com>. At this writing, I haven't tried it.
+
+:::
+
 ## Setup
 
 ```{r}

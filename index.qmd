@@ -10,16 +10,12 @@ Scraping is challenging because every example is different. As I do different sc
 
 ## The list so far
 
-- [Baseball Reference batting](s-bbref-batting.qmd)
-- [Paginated tables](s-paginated-tables.qmd)
-- [Playbill Grosses](s-playbill-grosses.qmd)
-- [Heisman votes](s-sref-cfb-heisman.qmd)
-- [Death row data](s-tdcj-deathrow.qmd)
-- [UT Soccer stats](s-ut-soccer-stats.qmd)
+In the navigation of this site you'll find different scraping examples, some explained mo betta than others. There may be other less-cooked examples in the repo that are not listed because they are too rare to share.
 
 ## Resources
 
 - The [rvest](https://rvest.tidyverse.org/index.html) package documentation.
+- A 30ish minute [video about the basics](https://www.youtube.com/watch?v=vU57vSbS-PY) by Albert Rapp. (I haven't watched this, but Albert generally has good tutorials.)
 - Hadley Wickham's [web scraping tutorial](https://github.com/hadley/web-scraping). He presented this as a half-day session at NICAR24.
 - My [Billboard Data](https://github.com/utdata/rwd-billboard-data) repo uses Github Actions and rvest to scrape on a schedule.
 

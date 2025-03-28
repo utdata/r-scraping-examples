@@ -1,5 +1,55 @@
 [
   {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Scraping examples in R",
+    "section": "",
+    "text": "Scraping is challenging because every example is different. As I do different scraping projects, I’ll try to save examples in this repo.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#about-the-site",
+    "href": "index.html#about-the-site",
+    "title": "Scraping examples in R",
+    "section": "",
+    "text": "Scraping is challenging because every example is different. As I do different scraping projects, I’ll try to save examples in this repo.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#the-list-so-far",
+    "href": "index.html#the-list-so-far",
+    "title": "Scraping examples in R",
+    "section": "The list so far",
+    "text": "The list so far\nIn the navigation of this site you’ll find different scraping examples, some explained mo betta than others. There may be other less-cooked examples in the repo that are not listed because they are too rare to share.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#resources",
+    "href": "index.html#resources",
+    "title": "Scraping examples in R",
+    "section": "Resources",
+    "text": "Resources\n\nThe rvest package documentation.\nA 30ish minute video about the basics by Albert Rapp. (I haven’t watched this, but Albert generally has good tutorials.)\nHadley Wickham’s web scraping tutorial. He presented this as a half-day session at NICAR24.\nMy Billboard Data repo uses Github Actions and rvest to scrape on a schedule.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#to-do",
+    "href": "index.html#to-do",
+    "title": "Scraping examples in R",
+    "section": "To do",
+    "text": "To do\nToo many to list, but I do want to learn polite and build in some wait time.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
     "objectID": "s-tdcj-deathrow.html",
     "href": "s-tdcj-deathrow.html",
     "title": "Texas Death Row",
@@ -47,6 +97,126 @@
     "text": "Export the files\n\nexecuted_raw |&gt; write_rds(\"data-raw/tdcj/executed_raw.rds\")\ndeathrow_raw |&gt; write_rds(\"data-raw/tdcj/deathrow_raw.rds\")",
     "crumbs": [
       "Texas Death Row"
+    ]
+  },
+  {
+    "objectID": "s-playbill-grosses.html",
+    "href": "s-playbill-grosses.html",
+    "title": "Playbill",
+    "section": "",
+    "text": "This would be a great example of needing to dive into specific cells within a table to pull out bits. That said, it is not figured out here yet.",
+    "crumbs": [
+      "Playbill"
+    ]
+  },
+  {
+    "objectID": "s-playbill-grosses.html#setup",
+    "href": "s-playbill-grosses.html#setup",
+    "title": "Playbill",
+    "section": "Setup",
+    "text": "Setup\n\nlibrary(tidyverse)\nlibrary(janitor)\nlibrary(rvest)",
+    "crumbs": [
+      "Playbill"
+    ]
+  },
+  {
+    "objectID": "s-playbill-grosses.html#basic-scrape",
+    "href": "s-playbill-grosses.html#basic-scrape",
+    "title": "Playbill",
+    "section": "Basic scrape",
+    "text": "Basic scrape\nCreate a url based on the week\n\nweek &lt;- \"2024-10-13\"\n\nurl &lt;- paste0(\"https://playbill.com/grosses?week=\",week)\nurl\n\n[1] \"https://playbill.com/grosses?week=2024-10-13\"\n\n\nRead in the url to get the page\n\nraw &lt;- read_html(url)\n\nraw\n\n{html_document}\n&lt;html lang=\"en\"&gt;\n[1] &lt;head&gt;\\n&lt;meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8 ...\n[2] &lt;body class=\"ua-desktop bsp-site-header-slidingnav \" style=\"\" data-dl-act ...\n\n\nFind the table and get its contents.\n\nmain_table &lt;- raw |&gt; html_element(\".bsp-table\") |&gt;  html_table()\n\nmain_table\n\n\n  \n\n\n\nThis works but it is a really shitty table that needs a don of cleaning. See potential refactor section below.",
+    "crumbs": [
+      "Playbill"
+    ]
+  },
+  {
+    "objectID": "s-playbill-grosses.html#export",
+    "href": "s-playbill-grosses.html#export",
+    "title": "Playbill",
+    "section": "Export",
+    "text": "Export\nExporting this awful table into a folder called playbill to keep it away from other things.\n\nexport_path &lt;- paste0(\"data-raw/playbill/playbill_\",week,\".rds\")\n  \nexport_path\n\n[1] \"data-raw/playbill/playbill_2024-10-13.rds\"\n\nmain_table |&gt; write_rds(export_path)",
+    "crumbs": [
+      "Playbill"
+    ]
+  },
+  {
+    "objectID": "s-playbill-grosses.html#refactoring-this-code",
+    "href": "s-playbill-grosses.html#refactoring-this-code",
+    "title": "Playbill",
+    "section": "Refactoring this code",
+    "text": "Refactoring this code\nThis “works” but the table is formatted in such a way that there are probably better (but more complicated) ways to pull out the data more cleanly, especially form columns like the first one that have the name and theater in the same td. Those have data labels and such.\nI just don’t know if it would be better. It would take some work to find out.\n&lt;td data-label=\"Show\" class=\"col-0\"&gt;\n  &lt;a href=\"https://playbill.com/production/gross?production=c3b6dace-a78e-439f-b3f2-bde3381bc6ff\" data-cms-ai=\"0\" rel=\"external\"&gt;\n    &lt;span class=\"data-value\"&gt;&amp; Juliet&lt;/span&gt;\n  &lt;/a&gt;\n  &lt;span class=\"subtext\"&gt;Stephen Sondheim Theatre&lt;/span&gt;\n&lt;/td&gt;",
+    "crumbs": [
+      "Playbill"
+    ]
+  },
+  {
+    "objectID": "s-bbref-batting.html",
+    "href": "s-bbref-batting.html",
+    "title": "Baseball Reference batting",
+    "section": "",
+    "text": "This pulls standard batting statistics from baseball-reference.com. We want to tables “Player Standard Batting” which is downpage on this for 2024. There are actually two tables, one for regular season and one for playoffs. We want multiple seasons.\nIn this examples, we create a variable for the year that we can set and rerun. Could reconfigure to send a vector of years, etc.",
+    "crumbs": [
+      "Baseball Reference batting"
+    ]
+  },
+  {
+    "objectID": "s-bbref-batting.html#setup",
+    "href": "s-bbref-batting.html#setup",
+    "title": "Baseball Reference batting",
+    "section": "Setup",
+    "text": "Setup\n\nlibrary(tidyverse)\nlibrary(janitor)\nlibrary(rvest)",
+    "crumbs": [
+      "Baseball Reference batting"
+    ]
+  },
+  {
+    "objectID": "s-bbref-batting.html#demonstrate-pulling-a-single-year",
+    "href": "s-bbref-batting.html#demonstrate-pulling-a-single-year",
+    "title": "Baseball Reference batting",
+    "section": "Demonstrate pulling a single year",
+    "text": "Demonstrate pulling a single year\n\nbr_year &lt;- 2023\n\n# Builds the url for the standard batting page\nurl &lt;- paste0(\"https://www.baseball-reference.com/leagues/majors/\", br_year, \"-standard-batting.shtml\")\n\nurl\n\n[1] \"https://www.baseball-reference.com/leagues/majors/2023-standard-batting.shtml\"\n\n\nThen we get all the tables on the page to see what they look like. We don’t actually use this object later, but it shows that you can build a list of tables.\n\n# reads in the HTML\nbr_batting_raw &lt;- read_html(url)\n\nbr_batting_raw\n\n{html_document}\n&lt;html data-version=\"klecko-\" data-root=\"/home/br/build\" lang=\"en\" class=\"no-js\"&gt;\n[1] &lt;head&gt;\\n&lt;meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8 ...\n[2] &lt;body class=\"br\"&gt;\\n&lt;div id=\"wrap\"&gt;\\n  \\n  &lt;div id=\"header\" role=\"banner\"&gt; ...\n\n\nThat just shows we are getting the HTML of the page.",
+    "crumbs": [
+      "Baseball Reference batting"
+    ]
+  },
+  {
+    "objectID": "s-bbref-batting.html#plucking-out-tables",
+    "href": "s-bbref-batting.html#plucking-out-tables",
+    "title": "Baseball Reference batting",
+    "section": "Plucking out tables",
+    "text": "Plucking out tables\nWe could get all the tables with html_table()\n\nall_tables &lt;- br_batting_raw |&gt; html_table()\n\nall_tables\n\n[[1]]\n# A tibble: 33 × 29\n   Tm        `#Bat` BatAge `R/G` G     PA    AB    R     H     `2B`  `3B`  HR   \n   &lt;chr&gt;     &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;\n 1 Arizona … 54     27.4   4.60  162   6124  5436  746   1359  274   44    166  \n 2 Atlanta … 53     27.9   5.85  162   6249  5597  947   1543  293   23    307  \n 3 Baltimor… 50     27.2   4.98  162   6123  5495  807   1399  309   28    183  \n 4 Boston R… 56     28.6   4.77  162   6174  5562  772   1437  339   19    182  \n 5 Chicago … 48     28.4   5.06  162   6220  5504  819   1399  269   30    196  \n 6 Chicago … 56     27.8   3.96  162   5980  5501  641   1308  264   13    171  \n 7 Cincinna… 65     26.8   4.83  162   6195  5499  783   1371  268   37    198  \n 8 Clevelan… 50     26.6   4.09  162   6096  5513  662   1379  294   29    124  \n 9 Colorado… 57     28.1   4.45  162   6055  5496  721   1368  305   31    163  \n10 Detroit … 51     27.4   4.08  162   6080  5478  661   1292  245   29    165  \n# ℹ 23 more rows\n# ℹ 17 more variables: RBI &lt;chr&gt;, SB &lt;chr&gt;, CS &lt;chr&gt;, BB &lt;chr&gt;, SO &lt;chr&gt;,\n#   BA &lt;chr&gt;, OBP &lt;chr&gt;, SLG &lt;chr&gt;, OPS &lt;chr&gt;, `OPS+` &lt;chr&gt;, TB &lt;chr&gt;,\n#   GDP &lt;chr&gt;, HBP &lt;chr&gt;, SH &lt;chr&gt;, SF &lt;chr&gt;, IBB &lt;chr&gt;, LOB &lt;chr&gt;\n\n[[2]]\n# A tibble: 881 × 34\n      Rk Player        Age Team  Lg      WAR     G    PA    AB     R     H  `2B`\n   &lt;int&gt; &lt;chr&gt;       &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;\n 1     1 Marcus Sem…    32 TEX   AL      7.7   162   753   670   122   185    40\n 2     2 Ronald Acu…    25 ATL   NL      8.4   159   735   643   149   217    35\n 3     3 Freddie Fr…    33 LAD   NL      6.8   161   730   637   131   211    59\n 4     4 Alex Bregm…    29 HOU   AL      4.9   161   724   622   103   163    28\n 5     5 Nathaniel …    27 TEX   AL      2.9   161   724   623    89   163    38\n 6     6 Matt Olson*    29 ATL   NL      7.5   162   720   608   127   172    27\n 7     7 Kyle Schwa…    30 PHI   NL      0.7   160   720   585   108   115    19\n 8     8 Steven Kwa…    25 CLE   AL      3.2   158   718   638    93   171    36\n 9     9 Austin Ril…    26 ATL   NL      6     159   715   636   117   179    32\n10    10 Julio Rodr…    22 SEA   AL      5.5   155   714   654   102   180    37\n# ℹ 871 more rows\n# ℹ 22 more variables: `3B` &lt;int&gt;, HR &lt;int&gt;, RBI &lt;int&gt;, SB &lt;int&gt;, CS &lt;int&gt;,\n#   BB &lt;int&gt;, SO &lt;int&gt;, BA &lt;dbl&gt;, OBP &lt;dbl&gt;, SLG &lt;dbl&gt;, OPS &lt;dbl&gt;,\n#   `OPS+` &lt;int&gt;, rOBA &lt;dbl&gt;, `Rbat+` &lt;int&gt;, TB &lt;int&gt;, GIDP &lt;int&gt;, HBP &lt;int&gt;,\n#   SH &lt;int&gt;, SF &lt;int&gt;, IBB &lt;int&gt;, Pos &lt;chr&gt;, Awards &lt;chr&gt;\n\n[[3]]\n# A tibble: 293 × 30\n      Rk Player        Age Team  Lg        G    PA    AB     R     H  `2B`  `3B`\n   &lt;int&gt; &lt;chr&gt;       &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;\n 1     1 Corey Seag…    29 TEX   AL,WS    17    82    66    18    20     6     0\n 2     2 Marcus Sem…    32 TEX   AL,WS    17    82    76    12    17     2     1\n 3     3 Ketel Mart…    29 ARI   NL,WS    17    79    73     6    24     7     1\n 4     4 Corbin Car…    22 ARI   NL,WS    17    78    66    11    18     1     1\n 5     5 Christian …    32 ARI   NL,WS    17    75    60     7    13     5     0\n 6     6 Evan Carte…    20 TEX   AL,WS    17    72    60     9    18     9     0\n 7     7 Nathaniel …    27 TEX   AL,WS    17    72    66    10    14     2     0\n 8     8 Jonah Heim#    28 TEX   AL,WS    17    71    66     5    14     0     0\n 9     9 Lourdes Gu…    29 ARI   NL,WS    17    70    66     5    18     3     0\n10    10 Josh Jung      25 TEX   AL,WS    17    70    65    13    20     4     1\n# ℹ 283 more rows\n# ℹ 18 more variables: HR &lt;int&gt;, RBI &lt;int&gt;, SB &lt;int&gt;, CS &lt;int&gt;, BB &lt;int&gt;,\n#   SO &lt;int&gt;, BA &lt;dbl&gt;, OBP &lt;dbl&gt;, SLG &lt;dbl&gt;, OPS &lt;dbl&gt;, TB &lt;int&gt;, GIDP &lt;int&gt;,\n#   HBP &lt;int&gt;, SH &lt;int&gt;, SF &lt;int&gt;, IBB &lt;int&gt;, Pos &lt;chr&gt;, Awards &lt;chr&gt;\n\n\nIf I then wanted the second table, I could use.\n\nall_tables[[2]]\n\n\n  \n\n\n\nInstead, I wanted to find the specific table more precisely by keying in on a specific element in the HTML code. I found that the batting tables I wanted had the id players_standard_batting and players_standard_batting_post. I can use the html_element function to find the specific table I want, then use html_table to convert it to a data frame.\nI do some other things to clean up the data, like renaming columns, adding a season and season_type (regular vs playoffs).\n\n# finds the regular season batting table\n# cleans names, adds year, add season type\nbr_batting_reg &lt;- br_batting_raw |&gt; \n  html_element(\"#players_standard_batting\") |&gt;\n  html_table() |&gt; \n  clean_names() |&gt; \n  mutate(\n    season = br_year,\n    season_type = \"Regular\",\n    .before = rk\n  )\n\n# finds the playoff batting table\n# cleans names, adds year, add season type\nbr_batting_post &lt;- br_batting_raw |&gt; \n  html_element(\"#players_standard_batting_post\") |&gt;\n  html_table() |&gt; \n  clean_names() |&gt; \n  mutate(\n    season = br_year,\n    season_type = \"Playoffs\",\n    .before = rk\n  )\n\nbr_batting_reg",
+    "crumbs": [
+      "Baseball Reference batting"
+    ]
+  },
+  {
+    "objectID": "s-bbref-batting.html#export-the-data",
+    "href": "s-bbref-batting.html#export-the-data",
+    "title": "Baseball Reference batting",
+    "section": "Export the data",
+    "text": "Export the data\nNow that I have that data, I can export it to a file.\nI’m using the paste0 function to build the file name based on the year I’m working with.\n\nexport_url_reg &lt;- paste0(\"data-raw/batting/br_bat_reg_\", br_year, \".rds\")\nexport_url_post &lt;- paste0(\"data-raw/batting/br_bat_post_\", br_year, \".rds\")\n\nexport_url_reg\n\n[1] \"data-raw/batting/br_bat_reg_2023.rds\"\n\nexport_url_post\n\n[1] \"data-raw/batting/br_bat_post_2023.rds\"\n\n\nAnd then I export ..\n\nbr_batting_reg |&gt; write_rds(export_url_reg)\nbr_batting_post |&gt; write_rds(export_url_post)",
+    "crumbs": [
+      "Baseball Reference batting"
+    ]
+  },
+  {
+    "objectID": "s-bbref-batting.html#create-scraping-function",
+    "href": "s-bbref-batting.html#create-scraping-function",
+    "title": "Baseball Reference batting",
+    "section": "Create scraping function",
+    "text": "Create scraping function\nHere we turn what we learned above into a function so we can loop through a range of years.\n\nscrape_batting &lt;- function(br_year) {\n\n  # Builds the url for the standard batting page\n  url &lt;- paste0(\"https://www.baseball-reference.com/leagues/majors/\", br_year, \"-standard-batting.shtml\")\n  \n  # reads in the HTML\n  br_batting_raw &lt;- read_html(url)\n  \n  # finds the regular season batting table\n  # cleans names, adds year, add season type\n  br_batting_reg &lt;- br_batting_raw |&gt; \n    html_element(\"#players_standard_batting\") |&gt;\n    html_table() |&gt; \n    clean_names() |&gt; \n    mutate(\n      season = br_year,\n      season_type = \"Regular\",\n      .before = rk\n    )\n  \n  # finds the playoff batting table\n  # cleans names, adds year, add season type\n  br_batting_post &lt;- br_batting_raw |&gt; \n    html_element(\"#players_standard_batting_post\") |&gt;\n    html_table() |&gt; \n    clean_names() |&gt; \n    mutate(\n      season = br_year,\n      season_type = \"Playoffs\",\n      .before = rk\n    )\n  \n  # builds the export path for each based on year\n  export_url_reg &lt;- paste0(\"data-raw/batting/br_bat_reg_\", br_year, \".rds\")\n  export_url_post &lt;- paste0(\"data-raw/batting/br_bat_post_\", br_year, \".rds\")\n  \n  # the actual export\n  br_batting_reg |&gt; write_rds(export_url_reg)\n  br_batting_post |&gt; write_rds(export_url_post)\n\n}",
+    "crumbs": [
+      "Baseball Reference batting"
+    ]
+  },
+  {
+    "objectID": "s-bbref-batting.html#do-the-deed",
+    "href": "s-bbref-batting.html#do-the-deed",
+    "title": "Baseball Reference batting",
+    "section": "Do the deed",
+    "text": "Do the deed\nHere I’m pulling just three years, but it could be extended.\n\n# Sets a range of years to collect\nyrs &lt;- c(2000:2003)\n\n# Creates a loop to get those files\nfor (i in yrs) {\n  scrape_batting(i)\n}",
+    "crumbs": [
+      "Baseball Reference batting"
     ]
   },
   {
@@ -120,73 +290,63 @@
     ]
   },
   {
-    "objectID": "s-bbref-batting.html",
-    "href": "s-bbref-batting.html",
-    "title": "Baseball Reference batting",
+    "objectID": "s-sref-cfb-heisman.html",
+    "href": "s-sref-cfb-heisman.html",
+    "title": "Heisman voting table",
     "section": "",
-    "text": "This pulls standard batting statistics from baseball-reference.com. We want to tables “Player Standard Batting” which is downpage on this for 2024. There are actually two tables, one for regular season and one for playoffs. We want multiple seasons.",
+    "text": "This gets the Heisman Voting table for each year in a list of years.\nWhile I could scrape and build the data all at once, I choose to save each scraped file to disc first so the scraping doesn’t have to be rerun.",
     "crumbs": [
-      "Baseball Reference batting"
+      "Heisman voting table"
     ]
   },
   {
-    "objectID": "s-bbref-batting.html#setup",
-    "href": "s-bbref-batting.html#setup",
-    "title": "Baseball Reference batting",
+    "objectID": "s-sref-cfb-heisman.html#setup",
+    "href": "s-sref-cfb-heisman.html#setup",
+    "title": "Heisman voting table",
     "section": "Setup",
     "text": "Setup\n\nlibrary(tidyverse)\nlibrary(janitor)\nlibrary(rvest)",
     "crumbs": [
-      "Baseball Reference batting"
+      "Heisman voting table"
     ]
   },
   {
-    "objectID": "s-bbref-batting.html#demonstrate-pulling-a-single-year",
-    "href": "s-bbref-batting.html#demonstrate-pulling-a-single-year",
-    "title": "Baseball Reference batting",
-    "section": "Demonstrate pulling a single year",
-    "text": "Demonstrate pulling a single year\n\nbr_year &lt;- 2023\n\n# Builds the url for the standard batting page\nurl &lt;- paste0(\"https://www.baseball-reference.com/leagues/majors/\", br_year, \"-standard-batting.shtml\")\n\nurl\n\n[1] \"https://www.baseball-reference.com/leagues/majors/2023-standard-batting.shtml\"\n\n\nThen we get all the tables on the page to see what they look like. We don’t actually use this object later, but it shows that you can build a list of tables.\n\n# reads in the HTML\nbr_batting_raw &lt;- read_html(url)\n\nbr_batting_raw\n\n{html_document}\n&lt;html data-version=\"klecko-\" data-root=\"/home/br/build\" lang=\"en\" class=\"no-js\"&gt;\n[1] &lt;head&gt;\\n&lt;meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8 ...\n[2] &lt;body class=\"br\"&gt;\\n&lt;div id=\"wrap\"&gt;\\n  \\n  &lt;div id=\"header\" role=\"banner\"&gt; ...\n\n\nThat just shows we are getting the HTML of the page.",
+    "objectID": "s-sref-cfb-heisman.html#figure-out-the-scrape",
+    "href": "s-sref-cfb-heisman.html#figure-out-the-scrape",
+    "title": "Heisman voting table",
+    "section": "Figure out the scrape",
+    "text": "Figure out the scrape\nFiguring out the scrape with one url.\n\nurl &lt;- \"https://www.sports-reference.com/cfb/awards/heisman-1935.html\"\n\nh_test &lt;- read_html(url) |&gt; html_node(\"#heisman\") |&gt; html_table()\n\nh_test\n\n\n  \n\n\nh_test |&gt; write_csv(\"data-raw/heisman/h_test.csv\")",
     "crumbs": [
-      "Baseball Reference batting"
+      "Heisman voting table"
     ]
   },
   {
-    "objectID": "s-bbref-batting.html#plucking-out-tables",
-    "href": "s-bbref-batting.html#plucking-out-tables",
-    "title": "Baseball Reference batting",
-    "section": "Plucking out tables",
-    "text": "Plucking out tables\nWe could get all the tables with html_table()\n\nall_tables &lt;- br_batting_raw |&gt; html_table()\n\nall_tables\n\n[[1]]\n# A tibble: 33 × 29\n   Tm        `#Bat` BatAge `R/G` G     PA    AB    R     H     `2B`  `3B`  HR   \n   &lt;chr&gt;     &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;\n 1 Arizona … 54     27.4   4.60  162   6124  5436  746   1359  274   44    166  \n 2 Atlanta … 53     27.9   5.85  162   6249  5597  947   1543  293   23    307  \n 3 Baltimor… 50     27.2   4.98  162   6123  5495  807   1399  309   28    183  \n 4 Boston R… 56     28.6   4.77  162   6174  5562  772   1437  339   19    182  \n 5 Chicago … 48     28.4   5.06  162   6220  5504  819   1399  269   30    196  \n 6 Chicago … 56     27.8   3.96  162   5980  5501  641   1308  264   13    171  \n 7 Cincinna… 65     26.8   4.83  162   6195  5499  783   1371  268   37    198  \n 8 Clevelan… 50     26.6   4.09  162   6096  5513  662   1379  294   29    124  \n 9 Colorado… 57     28.1   4.45  162   6055  5496  721   1368  305   31    163  \n10 Detroit … 51     27.4   4.08  162   6080  5478  661   1292  245   29    165  \n# ℹ 23 more rows\n# ℹ 17 more variables: RBI &lt;chr&gt;, SB &lt;chr&gt;, CS &lt;chr&gt;, BB &lt;chr&gt;, SO &lt;chr&gt;,\n#   BA &lt;chr&gt;, OBP &lt;chr&gt;, SLG &lt;chr&gt;, OPS &lt;chr&gt;, `OPS+` &lt;chr&gt;, TB &lt;chr&gt;,\n#   GDP &lt;chr&gt;, HBP &lt;chr&gt;, SH &lt;chr&gt;, SF &lt;chr&gt;, IBB &lt;chr&gt;, LOB &lt;chr&gt;\n\n[[2]]\n# A tibble: 881 × 34\n      Rk Player        Age Team  Lg      WAR     G    PA    AB     R     H  `2B`\n   &lt;int&gt; &lt;chr&gt;       &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;\n 1     1 Marcus Sem…    32 TEX   AL      7.4   162   753   670   122   185    40\n 2     2 Ronald Acu…    25 ATL   NL      8.2   159   735   643   149   217    35\n 3     3 Freddie Fr…    33 LAD   NL      6.5   161   730   637   131   211    59\n 4     4 Alex Bregm…    29 HOU   AL      4.9   161   724   622   103   163    28\n 5     5 Nathaniel …    27 TEX   AL      2.6   161   724   623    89   163    38\n 6     6 Matt Olson*    29 ATL   NL      7.4   162   720   608   127   172    27\n 7     7 Kyle Schwa…    30 PHI   NL      0.6   160   720   585   108   115    19\n 8     8 Steven Kwa…    25 CLE   AL      3.6   158   718   638    93   171    36\n 9     9 Austin Ril…    26 ATL   NL      5.9   159   715   636   117   179    32\n10    10 Julio Rodr…    22 SEA   AL      5.3   155   714   654   102   180    37\n# ℹ 871 more rows\n# ℹ 22 more variables: `3B` &lt;int&gt;, HR &lt;int&gt;, RBI &lt;int&gt;, SB &lt;int&gt;, CS &lt;int&gt;,\n#   BB &lt;int&gt;, SO &lt;int&gt;, BA &lt;dbl&gt;, OBP &lt;dbl&gt;, SLG &lt;dbl&gt;, OPS &lt;dbl&gt;,\n#   `OPS+` &lt;int&gt;, rOBA &lt;dbl&gt;, `Rbat+` &lt;int&gt;, TB &lt;int&gt;, GIDP &lt;int&gt;, HBP &lt;int&gt;,\n#   SH &lt;int&gt;, SF &lt;int&gt;, IBB &lt;int&gt;, Pos &lt;chr&gt;, Awards &lt;chr&gt;\n\n[[3]]\n# A tibble: 293 × 30\n      Rk Player        Age Team  Lg        G    PA    AB     R     H  `2B`  `3B`\n   &lt;int&gt; &lt;chr&gt;       &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;\n 1     1 Corey Seag…    29 TEX   AL,WS    17    82    66    18    20     6     0\n 2     2 Marcus Sem…    32 TEX   AL,WS    17    82    76    12    17     2     1\n 3     3 Ketel Mart…    29 ARI   NL,WS    17    79    73     6    24     7     1\n 4     4 Corbin Car…    22 ARI   NL,WS    17    78    66    11    18     1     1\n 5     5 Christian …    32 ARI   NL,WS    17    75    60     7    13     5     0\n 6     6 Evan Carte…    20 TEX   AL,WS    17    72    60     9    18     9     0\n 7     7 Nathaniel …    27 TEX   AL,WS    17    72    66    10    14     2     0\n 8     8 Jonah Heim#    28 TEX   AL,WS    17    71    66     5    14     0     0\n 9     9 Lourdes Gu…    29 ARI   NL,WS    17    70    66     5    18     3     0\n10    10 Josh Jung      25 TEX   AL,WS    17    70    65    13    20     4     1\n# ℹ 283 more rows\n# ℹ 18 more variables: HR &lt;int&gt;, RBI &lt;int&gt;, SB &lt;int&gt;, CS &lt;int&gt;, BB &lt;int&gt;,\n#   SO &lt;int&gt;, BA &lt;dbl&gt;, OBP &lt;dbl&gt;, SLG &lt;dbl&gt;, OPS &lt;dbl&gt;, TB &lt;int&gt;, GIDP &lt;int&gt;,\n#   HBP &lt;int&gt;, SH &lt;int&gt;, SF &lt;int&gt;, IBB &lt;int&gt;, Pos &lt;chr&gt;, Awards &lt;chr&gt;\n\n\nIf I then wanted the second table, I could use.\n\nall_tables[[2]]\n\n\n  \n\n\n\nInstead, I wanted to find the specific table more precisely by keying in on a specific element in the HTML code. I found that the batting tables I wanted had the id players_standard_batting and players_standard_batting_post. I can use the html_element function to find the specific table I want, then use html_table to convert it to a data frame.\nI do some other things to clean up the data, like renaming columns, adding a season and season_type (regular vs playoffs).\n\n# finds the regular season batting table\n# cleans names, adds year, add season type\nbr_batting_reg &lt;- br_batting_raw |&gt; \n  html_element(\"#players_standard_batting\") |&gt;\n  html_table() |&gt; \n  clean_names() |&gt; \n  mutate(\n    season = br_year,\n    season_type = \"Regular\",\n    .before = rk\n  )\n\n# finds the playoff batting table\n# cleans names, adds year, add season type\nbr_batting_post &lt;- br_batting_raw |&gt; \n  html_element(\"#players_standard_batting_post\") |&gt;\n  html_table() |&gt; \n  clean_names() |&gt; \n  mutate(\n    season = br_year,\n    season_type = \"Playoffs\",\n    .before = rk\n  )\n\nbr_batting_reg",
+    "objectID": "s-sref-cfb-heisman.html#make-scraping-a-function",
+    "href": "s-sref-cfb-heisman.html#make-scraping-a-function",
+    "title": "Heisman voting table",
+    "section": "Make scraping a function",
+    "text": "Make scraping a function\nCreates a function to scrape a page with this table with some time between scrapes so we don’t blast the server. It saves the files into data-raw/heisman.\n\nscrape_heisman &lt;- function(yr) {\n  # build the url\n  url &lt;- paste0(\"https://www.sports-reference.com/cfb/awards/heisman-\", yr, \".html\")\n  \n  # Wait 2 seconds\n  Sys.sleep(2)\n  \n  # get the table\n  table &lt;- read_html(url)  |&gt; html_node(\"#heisman\") |&gt; html_table()\n  \n  # create an export url\n  export_url &lt;- paste0(\"data-raw/heisman/hv-\", yr, \".csv\")\n  \n  # export the table\n  table |&gt; write_csv(export_url)\n  }\n\nScrape all the years in a list. Doing only four years here.\n\nyrs &lt;- c(2020:2023)\n\n# Creates a loop to get those files\nfor (i in yrs) {\n  scrape_heisman(i)\n}",
     "crumbs": [
-      "Baseball Reference batting"
+      "Heisman voting table"
     ]
   },
   {
-    "objectID": "s-bbref-batting.html#export-the-data",
-    "href": "s-bbref-batting.html#export-the-data",
-    "title": "Baseball Reference batting",
-    "section": "Export the data",
-    "text": "Export the data\nNow that I have that data, I can export it to a file.\nI’m using the paste0 function to build the file name based on the year I’m working with.\n\nexport_url_reg &lt;- paste0(\"data-raw/batting/br_bat_reg_\", br_year, \".rds\")\nexport_url_post &lt;- paste0(\"data-raw/batting/br_bat_post_\", br_year, \".rds\")\n\nexport_url_reg\n\n[1] \"data-raw/batting/br_bat_reg_2023.rds\"\n\nexport_url_post\n\n[1] \"data-raw/batting/br_bat_post_2023.rds\"\n\n\nAnd then I export ..\n\nbr_batting_reg |&gt; write_rds(export_url_reg)\nbr_batting_post |&gt; write_rds(export_url_post)",
+    "objectID": "s-sref-cfb-heisman.html#combine-the-files",
+    "href": "s-sref-cfb-heisman.html#combine-the-files",
+    "title": "Heisman voting table",
+    "section": "Combine the files",
+    "text": "Combine the files\nMakes a list of all the files that end with a digit then .csv.\n\nfiles_list &lt;- list.files(\n  \"data-raw/heisman\",\n  pattern = \"\\\\d.csv$\",\n  full.names = TRUE\n)\n\nfiles_list\n\n[1] \"data-raw/heisman/hv-2020.csv\" \"data-raw/heisman/hv-2021.csv\"\n[3] \"data-raw/heisman/hv-2022.csv\" \"data-raw/heisman/hv-2023.csv\"\n\n\nTakes that list and maps over them, applying read_csv while preserving the name of the file the data came from.\n\nheisman_raw &lt;- files_list |&gt; \n  set_names(basename) |&gt;\n  map(read_csv) |&gt; \n  list_rbind(names_to = \"source\")\n\nheisman_raw",
     "crumbs": [
-      "Baseball Reference batting"
+      "Heisman voting table"
     ]
   },
   {
-    "objectID": "s-bbref-batting.html#create-scraping-function",
-    "href": "s-bbref-batting.html#create-scraping-function",
-    "title": "Baseball Reference batting",
-    "section": "Create scraping function",
-    "text": "Create scraping function\nHere we turn what we learned above into a function so we can loop through a range of years.\n\nscrape_batting &lt;- function(br_year) {\n\n  # Builds the url for the standard batting page\n  url &lt;- paste0(\"https://www.baseball-reference.com/leagues/majors/\", br_year, \"-standard-batting.shtml\")\n  \n  # reads in the HTML\n  br_batting_raw &lt;- read_html(url)\n  \n  # finds the regular season batting table\n  # cleans names, adds year, add season type\n  br_batting_reg &lt;- br_batting_raw |&gt; \n    html_element(\"#players_standard_batting\") |&gt;\n    html_table() |&gt; \n    clean_names() |&gt; \n    mutate(\n      season = br_year,\n      season_type = \"Regular\",\n      .before = rk\n    )\n  \n  # finds the playoff batting table\n  # cleans names, adds year, add season type\n  br_batting_post &lt;- br_batting_raw |&gt; \n    html_element(\"#players_standard_batting_post\") |&gt;\n    html_table() |&gt; \n    clean_names() |&gt; \n    mutate(\n      season = br_year,\n      season_type = \"Playoffs\",\n      .before = rk\n    )\n  \n  # builds the export path for each based on year\n  export_url_reg &lt;- paste0(\"data-raw/batting/br_bat_reg_\", br_year, \".rds\")\n  export_url_post &lt;- paste0(\"data-raw/batting/br_bat_post_\", br_year, \".rds\")\n  \n  # the actual export\n  br_batting_reg |&gt; write_rds(export_url_reg)\n  br_batting_post |&gt; write_rds(export_url_post)\n\n}",
+    "objectID": "s-sref-cfb-heisman.html#pull-the-year",
+    "href": "s-sref-cfb-heisman.html#pull-the-year",
+    "title": "Heisman voting table",
+    "section": "Pull the year",
+    "text": "Pull the year\nUses str_sub to pull the year from the source column base on its position.\n\nheisman_year &lt;- heisman_raw |&gt; \n  mutate(year = str_sub(source,4,7), .after = source)\n\nheisman_year\n\n\n  \n\n\n\nNow you can drop the source columns.",
     "crumbs": [
-      "Baseball Reference batting"
-    ]
-  },
-  {
-    "objectID": "s-bbref-batting.html#do-the-deed",
-    "href": "s-bbref-batting.html#do-the-deed",
-    "title": "Baseball Reference batting",
-    "section": "Do the deed",
-    "text": "Do the deed\nHere I’m pulling just three years, but it could be extended.\n\n# Sets a range of years to collect\nyrs &lt;- c(2000:2003)\n\n# Creates a loop to get those files\nfor (i in yrs) {\n  scrape_batting(i)\n}",
-    "crumbs": [
-      "Baseball Reference batting"
+      "Heisman voting table"
     ]
   },
   {
@@ -257,173 +417,6 @@
     "text": "Working out details\nThis is the code I used to work out the process function above.\n\nGet the raw HTML\n\ngame_stats_raw &lt;-  read_html(\"https://texaslonghorns.com/sports/womens-soccer/stats/2015/north-carolina/boxscore/8819\")\n\n\n\nMatch details\nWe pull these from a description list on the main “Box Score” page.\n\nm_details &lt;- game_stats_raw |&gt; html_nodes(\"dd\") |&gt; html_text()\n\nm_date &lt;- m_details[[1]] |&gt; mdy()\nm_site &lt;- m_details[[3]]\nm_stadium &lt;- m_details[[4]]\n\n\n\nTeams and scores\nWe get these from the subheads on the “Individual” page. I had to target these pretty specifically by id and class to get the correct tables.\n\nsubheads &lt;- game_stats_raw |&gt; html_nodes(\"#individual-stats\") |&gt; html_nodes(\".sub-heading\") |&gt; html_text()\n\nv_team_score &lt;- subheads[[1]]\nh_team_score &lt;- subheads[[2]]\n\nv_team &lt;- v_team_score[[1]] |&gt; str_remove(\" \\\\d+$\") |&gt; str_remove(\"^#\\\\d+ \")\nh_team &lt;- h_team_score[[1]] |&gt; str_remove(\" \\\\d+$\") |&gt; str_remove(\"^#\\\\d+ \")\n\nv_score &lt;- v_team_score |&gt; str_extract(\"\\\\d+$\")\nh_score &lt;- h_team_score |&gt; str_extract(\"\\\\d+$\")\n\npaste(\"Visiting team was\", v_team, \"and their score was\", v_score)\n\n[1] \"Visiting team was North Carolina and their score was 2\"\n\npaste(\"Home team was\", h_team, \"and their score was\", h_score)\n\n[1] \"Home team was Texas and their score was 0\"\n\n\n\n\nIndividual stats\nThere are four separate tables we need that are displayed on the “Individual” tab.\n\nGet the tables\n\ngame_stats_tables &lt;- game_stats_raw |&gt;\n  html_elements(\"section#individual-stats\")|&gt;\n  minimal_html() |&gt; html_table()\n\ngame_stats_tables\n\n[[1]]\n# A tibble: 23 × 8\n   Pos      `#`      Player                        SH    SOG   G     A     MIN  \n   &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt;                         &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;\n 1 Starters Starters \"Starters\"                    Star… Star… Star… Star… Star…\n 2 D        5        \"5 \\r\\n                     … 0     0     0     0     90   \n 3 F        6        \"6 \\r\\n                     … 5     1     0     1     61   \n 4 M        10       \"10 \\r\\n                    … 4     1     1     0     61   \n 5 M        11       \"11 \\r\\n                    … 0     0     0     0     66   \n 6 F        12       \"12 \\r\\n                    … 4     2     0     0     62   \n 7 M        15       \"15 \\r\\n                    … 0     0     0     0     66   \n 8 D        16       \"16 \\r\\n                    … 1     0     0     0     90   \n 9 M        21       \"21 \\r\\n                    … 1     1     1     0     66   \n10 GK       23       \"23 \\r\\n                    … 0     0     0     0     45   \n# ℹ 13 more rows\n\n[[2]]\n# A tibble: 4 × 6\n  Position      `#`           Goalie           Minutes       GA          Saves  \n  &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;            &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt;  \n1 \"Goalkeeping\" \"Goalkeeping\" Goalkeeping      \"Goalkeeping\" Goalkeeping Goalke…\n2 \"GK\"          \"1\"           Bryane Heaberlin \"45:00\"       0           2      \n3 \"GK\"          \"23\"          Lindsey Harris   \"45:00\"       0           0      \n4 \"\"            \"\"            Totals           \"\"            0           2      \n\n[[3]]\n# A tibble: 23 × 8\n   Pos      `#`      Player                        SH    SOG   G     A     MIN  \n   &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt;                         &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;\n 1 Starters Starters \"Starters\"                    Star… Star… Star… Star… Star…\n 2 GK       1        \"1 \\r\\n                     … 1     1     0     0     90   \n 3 M        4        \"4 \\r\\n                     … 1     1     0     0     90   \n 4 M        5        \"5 \\r\\n                     … 0     0     0     0     85   \n 5 D        12       \"12 \\r\\n                    … 0     0     0     0     90   \n 6 D        13       \"13 \\r\\n                    … 0     0     0     0     90   \n 7 D        14       \"14 \\r\\n                    … 0     0     0     0     90   \n 8 F        17       \"17 \\r\\n                    … 2     0     0     0     66   \n 9 F        20       \"20 \\r\\n                    … 1     0     0     0     89   \n10 F        23       \"23 \\r\\n                    … 1     0     0     0     68   \n# ℹ 13 more rows\n\n[[4]]\n# A tibble: 3 × 6\n  Position      `#`           Goalie      Minutes       GA          Saves      \n  &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt;      \n1 \"Goalkeeping\" \"Goalkeeping\" Goalkeeping \"Goalkeeping\" Goalkeeping Goalkeeping\n2 \"GK\"          \"1\"           Smith, Abby \"90:00\"       2           7          \n3 \"\"            \"\"            Totals      \"\"            2           7          \n\n\n\n\nSaves specific tables we need\n\nv_pl_raw &lt;- game_stats_tables[[1]] |&gt; clean_names()\nv_gk_raw &lt;- game_stats_tables[[2]] |&gt; clean_names()\nh_pl_raw &lt;- game_stats_tables[[3]] |&gt; clean_names()\nh_gk_raw &lt;- game_stats_tables[[4]] |&gt; clean_names()\n\n\n\nClean individual stats\nA function to clean stats …\n\nAdds a column to indicate starters vs subs\nRemoves totals and other headers\n\n\n  # A function to handle some player stats cleaning\n  clean_indi_stats &lt;- function(df) {\n    df |&gt; mutate(\n    start = case_when(\n      player == \"Starters\" ~ \"Starter\",\n      player == \"Substitutes\" ~ \"Substitute\",\n      player == \"Totals\" ~ \"Total\",\n      .default = NA\n    ), .after = pos,\n  ) |&gt; fill(start) |&gt; \n    filter(!player %in% c(\"Starters\", \"Substitutes\", \"Totals\")) |&gt; \n    mutate(\n      date = m_date,\n      site = m_site,\n    )\n  }\n\nThis takes the individual stats and runs them through the cleaning function above and then adds home and away team values.\n\nv_pl &lt;- v_pl_raw |&gt; \n  clean_indi_stats() |&gt; \n  mutate(team = v_team, vs = h_team)\n\nv_pl\n\n\n  \n\n\n\n\nh_pl &lt;- h_pl_raw |&gt; \n  clean_indi_stats() |&gt; \n  mutate(team = h_team, vs = v_team)\n\nh_pl\n\n\n  \n\n\n\n\n\nCombine individual stats\nCombines the visitor/home two player stats\n\npl &lt;- bind_rows(v_pl, h_pl)\n\npl\n\n\n  \n\n\n\n\n\nClean goalkeeper stats\nThis is the same process as above, but for goalkeepers. It’s a little less complicated.\n\nv_gk &lt;- v_gk_raw |&gt;\n  filter(!goalie %in% c(\"Goalkeeping\", \"Totals\")) |&gt; \n  mutate(team = v_team, vs = h_team, date = m_date, site = m_site)\n\nh_gk &lt;- h_gk_raw |&gt;\n  filter(!goalie %in% c(\"Goalkeeping\", \"Totals\")) |&gt; \n  mutate(team = h_team, vs = v_team, date = m_date, site = m_site)\n\nv_gk\n\n\n  \n\n\nh_gk\n\n\n  \n\n\n\n\n\nCombine goalkeepers\n\ngk &lt;- bind_rows(v_gk, h_gk)\n\ngk\n\n\n  \n\n\n\n\n\n\nWriting the exports\nThe actual exports are commented out so we don’t overwrite what came from above.\n\nfile_name_prefix &lt;- paste(m_date, v_team, h_team, sep = \"_\") |&gt; str_replace_all(\" \", \"_\") |&gt; str_replace_all(\"/\", \"-\")\n\npl_export_path &lt;- paste(\"data-raw/soccer/\", \"pl_\", file_name_prefix, \".rds\", sep = \"\")\ngk_export_path &lt;- paste(\"data-raw/soccer/\", \"gk_\", file_name_prefix, \".rds\", sep = \"\")\n\npl_export_path\n\n[1] \"data-raw/soccer/pl_2015-08-28_North_Carolina_Texas.rds\"\n\ngk_export_path\n\n[1] \"data-raw/soccer/gk_2015-08-28_North_Carolina_Texas.rds\"\n\n## Commented so it doesn't write anything out\n# pl |&gt; write_rds(pl_export_path)\n# gk |&gt; write_rds(gk_export_path)",
     "crumbs": [
       "Longhorn Soccer Stats"
-    ]
-  },
-  {
-    "objectID": "s-sref-cfb-heisman.html",
-    "href": "s-sref-cfb-heisman.html",
-    "title": "Heisman voting table",
-    "section": "",
-    "text": "This gets the Heisman Voting table for each year in a list of years.\nWhile I could scrape and build the data all at once, I choose to save each scraped file to disc first so the scraping doesn’t have to be rerun.",
-    "crumbs": [
-      "Heisman voting table"
-    ]
-  },
-  {
-    "objectID": "s-sref-cfb-heisman.html#setup",
-    "href": "s-sref-cfb-heisman.html#setup",
-    "title": "Heisman voting table",
-    "section": "Setup",
-    "text": "Setup\n\nlibrary(tidyverse)\nlibrary(janitor)\nlibrary(rvest)",
-    "crumbs": [
-      "Heisman voting table"
-    ]
-  },
-  {
-    "objectID": "s-sref-cfb-heisman.html#figure-out-the-scrape",
-    "href": "s-sref-cfb-heisman.html#figure-out-the-scrape",
-    "title": "Heisman voting table",
-    "section": "Figure out the scrape",
-    "text": "Figure out the scrape\nFiguring out the scrape with one url.\n\nurl &lt;- \"https://www.sports-reference.com/cfb/awards/heisman-1935.html\"\n\nh_test &lt;- read_html(url) |&gt; html_node(\"#heisman\") |&gt; html_table()\n\nh_test\n\n\n  \n\n\nh_test |&gt; write_csv(\"data-raw/heisman/h_test.csv\")",
-    "crumbs": [
-      "Heisman voting table"
-    ]
-  },
-  {
-    "objectID": "s-sref-cfb-heisman.html#make-scraping-a-function",
-    "href": "s-sref-cfb-heisman.html#make-scraping-a-function",
-    "title": "Heisman voting table",
-    "section": "Make scraping a function",
-    "text": "Make scraping a function\nCreates a function to scrape a page with this table with some time between scrapes so we don’t blast the server. It saves the files into data-raw/heisman.\n\nscrape_heisman &lt;- function(yr) {\n  # build the url\n  url &lt;- paste0(\"https://www.sports-reference.com/cfb/awards/heisman-\", yr, \".html\")\n  \n  # Wait 2 seconds\n  Sys.sleep(2)\n  \n  # get the table\n  table &lt;- read_html(url)  |&gt; html_node(\"#heisman\") |&gt; html_table()\n  \n  # create an export url\n  export_url &lt;- paste0(\"data-raw/heisman/hv-\", yr, \".csv\")\n  \n  # export the table\n  table |&gt; write_csv(export_url)\n  }\n\nScrape all the years in a list. Doing only four years here.\n\nyrs &lt;- c(2020:2023)\n\n# Creates a loop to get those files\nfor (i in yrs) {\n  scrape_heisman(i)\n}",
-    "crumbs": [
-      "Heisman voting table"
-    ]
-  },
-  {
-    "objectID": "s-sref-cfb-heisman.html#combine-the-files",
-    "href": "s-sref-cfb-heisman.html#combine-the-files",
-    "title": "Heisman voting table",
-    "section": "Combine the files",
-    "text": "Combine the files\nMakes a list of all the files that end with a digit then .csv.\n\nfiles_list &lt;- list.files(\n  \"data-raw/heisman\",\n  pattern = \"\\\\d.csv$\",\n  full.names = TRUE\n)\n\nfiles_list\n\n[1] \"data-raw/heisman/hv-2020.csv\" \"data-raw/heisman/hv-2021.csv\"\n[3] \"data-raw/heisman/hv-2022.csv\" \"data-raw/heisman/hv-2023.csv\"\n\n\nTakes that list and maps over them, applying read_csv while preserving the name of the file the data came from.\n\nheisman_raw &lt;- files_list |&gt; \n  set_names(basename) |&gt;\n  map(read_csv) |&gt; \n  list_rbind(names_to = \"source\")\n\nheisman_raw",
-    "crumbs": [
-      "Heisman voting table"
-    ]
-  },
-  {
-    "objectID": "s-sref-cfb-heisman.html#pull-the-year",
-    "href": "s-sref-cfb-heisman.html#pull-the-year",
-    "title": "Heisman voting table",
-    "section": "Pull the year",
-    "text": "Pull the year\nUses str_sub to pull the year from the source column base on its position.\n\nheisman_year &lt;- heisman_raw |&gt; \n  mutate(year = str_sub(source,4,7), .after = source)\n\nheisman_year\n\n\n  \n\n\n\nNow you can drop the source columns.",
-    "crumbs": [
-      "Heisman voting table"
-    ]
-  },
-  {
-    "objectID": "s-skating.html",
-    "href": "s-skating.html",
-    "title": "skating",
-    "section": "",
-    "text": "library(tidyverse)\nlibrary(janitor)\nlibrary(rvest)\n\n\ntables &lt;- read_html(\"https://skatingscores.com/1314/oly/sr/men/i/results/\") |&gt; html_table()\n\nskating &lt;- tables[[2]] |&gt; clean_names()\n\nskating |&gt; filter(nat == \"🇦🇹\")"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Scraping examples in R",
-    "section": "",
-    "text": "Scraping is challenging because every example is different. As I do different scraping projects, I’ll try to save examples in this repo.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#about-the-site",
-    "href": "index.html#about-the-site",
-    "title": "Scraping examples in R",
-    "section": "",
-    "text": "Scraping is challenging because every example is different. As I do different scraping projects, I’ll try to save examples in this repo.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#the-list-so-far",
-    "href": "index.html#the-list-so-far",
-    "title": "Scraping examples in R",
-    "section": "The list so far",
-    "text": "The list so far\n\nBaseball Reference batting\nPaginated tables\nPlaybill Grosses\nHeisman votes\nDeath row data\nUT Soccer stats",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#resources",
-    "href": "index.html#resources",
-    "title": "Scraping examples in R",
-    "section": "Resources",
-    "text": "Resources\n\nThe rvest package documentation.\nHadley Wickham’s web scraping tutorial. He presented this as a half-day session at NICAR24.\nMy Billboard Data repo uses Github Actions and rvest to scrape on a schedule.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "index.html#to-do",
-    "href": "index.html#to-do",
-    "title": "Scraping examples in R",
-    "section": "To do",
-    "text": "To do\nToo many to list, but I do want to learn polite and build in some wait time.",
-    "crumbs": [
-      "Home"
-    ]
-  },
-  {
-    "objectID": "s-playbill-grosses.html",
-    "href": "s-playbill-grosses.html",
-    "title": "Playbill",
-    "section": "",
-    "text": "This would be a great example of needing to dive into specific cells within a table to pull out bits. That said, it is not figured out here yet.",
-    "crumbs": [
-      "Playbill"
-    ]
-  },
-  {
-    "objectID": "s-playbill-grosses.html#setup",
-    "href": "s-playbill-grosses.html#setup",
-    "title": "Playbill",
-    "section": "Setup",
-    "text": "Setup\n\nlibrary(tidyverse)\nlibrary(janitor)\nlibrary(rvest)",
-    "crumbs": [
-      "Playbill"
-    ]
-  },
-  {
-    "objectID": "s-playbill-grosses.html#basic-scrape",
-    "href": "s-playbill-grosses.html#basic-scrape",
-    "title": "Playbill",
-    "section": "Basic scrape",
-    "text": "Basic scrape\nCreate a url based on the week\n\nweek &lt;- \"2024-10-13\"\n\nurl &lt;- paste0(\"https://playbill.com/grosses?week=\",week)\nurl\n\n[1] \"https://playbill.com/grosses?week=2024-10-13\"\n\n\nRead in the url to get the page\n\nraw &lt;- read_html(url)\n\nraw\n\n{html_document}\n&lt;html lang=\"en\"&gt;\n[1] &lt;head&gt;\\n&lt;meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8 ...\n[2] &lt;body class=\"ua-desktop bsp-site-header-slidingnav \" style=\"\" data-dl-act ...\n\n\nFind the table and get its contents.\n\nmain_table &lt;- raw |&gt; html_element(\".bsp-table\") |&gt;  html_table()\n\nmain_table\n\n\n  \n\n\n\nThis works but it is a really shitty table that needs a don of cleaning. See potential refactor section below.",
-    "crumbs": [
-      "Playbill"
-    ]
-  },
-  {
-    "objectID": "s-playbill-grosses.html#export",
-    "href": "s-playbill-grosses.html#export",
-    "title": "Playbill",
-    "section": "Export",
-    "text": "Export\nExporting this awful table into a folder called playbill to keep it away from other things.\n\nexport_path &lt;- paste0(\"data-raw/playbill/playbill_\",week,\".rds\")\n  \nexport_path\n\n[1] \"data-raw/playbill/playbill_2024-10-13.rds\"\n\nmain_table |&gt; write_rds(export_path)",
-    "crumbs": [
-      "Playbill"
-    ]
-  },
-  {
-    "objectID": "s-playbill-grosses.html#refactoring-this-code",
-    "href": "s-playbill-grosses.html#refactoring-this-code",
-    "title": "Playbill",
-    "section": "Refactoring this code",
-    "text": "Refactoring this code\nThis “works” but the table is formatted in such a way that there are probably better (but more complicated) ways to pull out the data more cleanly, especially form columns like the first one that have the name and theater in the same td. Those have data labels and such.\nI just don’t know if it would be better. It would take some work to find out.\n&lt;td data-label=\"Show\" class=\"col-0\"&gt;\n  &lt;a href=\"https://playbill.com/production/gross?production=c3b6dace-a78e-439f-b3f2-bde3381bc6ff\" data-cms-ai=\"0\" rel=\"external\"&gt;\n    &lt;span class=\"data-value\"&gt;&amp; Juliet&lt;/span&gt;\n  &lt;/a&gt;\n  &lt;span class=\"subtext\"&gt;Stephen Sondheim Theatre&lt;/span&gt;\n&lt;/td&gt;",
-    "crumbs": [
-      "Playbill"
     ]
   }
 ]

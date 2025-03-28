@@ -1,6 +1,9 @@
 project:
   type: website
   output-dir: docs
+  render:
+  - "s-*.qmd"
+  - "index.qmd"
 
 website:
   title: "Scraping examples"
@@ -10,12 +13,7 @@ website:
     contents:
       - href: index.qmd
         text: Home
-      - s-bbref-batting.qmd
-      - s-paginated-tables.qmd
-      - s-playbill-grosses.qmd
-      - s-sref-cfb-heisman.qmd
-      - s-tdcj-deathrow.qmd
-      - s-ut-soccer-stats.qmd
+      - auto: "s-*.qmd"
   repo-url: https://github.com/utdata/r-scraping-examples
   repo-actions: [source, issue]
 

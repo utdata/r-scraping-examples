@@ -1,0 +1,150 @@
+---
+title: "Legislative bills"
+format: html
+---
+
+Looking to scrape [Bill statistics](https://lrl.texas.gov/sessions/billStatistics.cfm) for the Legislative Reference Library and the Texas State Library and Archives Commission.
+
+This example provides a few challenges.
+
+- There are nearly 200 tables, but the description of the table is not within it. It is in a headline above it.
+- There are asterisks to note anamolies in the data. This changes the datatypes of some columns when they are scraped. While we'll need to remove those before doing any kind of math, we need to have a full accounting of what those are somewhere and take note of them in our reportings, analysis.
+
+## Typical setup
+
+```{r}
+#| label: setup
+#| message: false
+#| warning: false
+
+library(tidyverse)
+library(janitor)
+library(rvest)
+```
+
+
+## Basic scrapes, etc
+
+Get the html for the page ...
+
+```{r}
+raw_html <- read_html("https://lrl.texas.gov/sessions/billStatistics.cfm")
+```
+
+Then harvest all of the tables ...
+
+```{r}
+tables <- raw_html |> html_table()
+
+tables[[1]]
+```
+
+But we don't know what each table is because the headline is above it.
+
+Some options:
+
+- We can pull all of the headlines (which are `<h2`s) and see if there are the same number of those as there are tables?
+- If so, perhaps we can we use their index as a way to join x headline with y table?
+
+Let's get the text of all those headlines:
+
+```{r}
+headers <- raw_html |> html_elements("h2") |> html_text(trim = TRUE)
+
+headers[[1]]
+```
+
+There are indeed the same number h2s as there are tables (189), so maybe this idea will work.
+
+One quick test on this: Let's grab the 10th headline and 10th table to see if they match.
+
+```{r}
+headers[[10]]
+tables[[10]]
+```
+
+This matches what is on the page.
+
+## The problems
+
+OK, there was a bit of futzing around with all of this before we got to the answers below. I am gonna say ChatGPT did a good job of helping get to solutions.
+
+- We have to put together the matching headlines and tables. Ideally we want the tables to have a column that has the information that is in the header.
+- We will also have trouble with the column names within the tables. We need to use `clean_names()` on those.
+- We want to put all the tables together, HOWEVER, because of the asterisks in some data cells, the datatyps are not the same across all the tables. The answer is to change all of those numbers to text first and then combine the tables.
+
+After all that we still have to deal with those asterisks, but we'll do that later. It's as much a reporting problem.
+
+### Clean column names
+
+```{r}
+tables_names <- map(tables, clean_names)
+
+tables_names[[1]]
+```
+
+### Set datatypes
+
+Here we are changing numbered columns to text
+
+```{r}
+tables_char <- map(tables_names, mutate, across(!status, as.character))
+
+tables_char[[1]]
+```
+
+### Add headers
+
+This is an advanced `map2()` function were we are using values from two lists (the tables and the headers) within a function.
+
+```{r}
+tables_with_header_column <- map2(headers, tables_char, ~{
+  .y %>% mutate(header = .x)
+})
+
+tables_with_header_column[[1]]
+```
+
+## Combine the tables
+
+At this point now we can combine the tables with `list_rbind()`.
+
+There is also a bit of cleanup to do after this:
+
+- Remove a blank column `x`.
+- There are a couple of years that had unique columns, and we'll relocate those just for sanity take to keep the `totals` column at theend.
+
+```{r}
+tables_combined <- tables_with_header_column |>
+  list_rbind() |> # combines the columns
+  select(-x) |> # removes x
+  relocate(c(hcm, hmm), .before = total_hb_sb) # moves columns
+
+tables_combined
+```
+
+## Reconfigure header
+
+It would be more useful to us to take the long header "Bill statistics for the 20th Legislature, 1st Called Session" and instead make a column for which legislature it is, and which session it is.
+
+```{r}
+tables_combined |> 
+  separate(header, sep = ",", c("legislature", "session")) |> 
+  mutate(legislature = str_remove(legislature, "Bill statistics for the "))
+
+```
+
+::: callout-warning
+
+## More cleaning needed
+
+- The `legislature` variable is not consistent and there are some specific rows that could be cleaned up. Maybe drop the word "Legislature".
+- In `session` blank values should probably be "Regular Session". Also, the term "called session" is sometimes abbreviated.
+- All the asterisk notes need to be understood, documented and accounted for in analysis. Once the documentation is done, then could use `across` to change all those columns back to numbers.
+
+## Understanding this data
+
+Understanding how this data is structured will be important before doing any analysis. In addition to those asterisks mentioned above, each row is really a status of legislation, so typical GSA analysis will need some thought about how everything is filtered.
+
+:::
+
